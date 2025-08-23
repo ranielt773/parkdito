@@ -1,0 +1,36 @@
+name: parkditto
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  slide_to_act: ^2.0.1
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.0
+flutter:
+  uses-material-design: true
+  assets:
+    - lib/assets/logo.png
+    - lib/assets/logoo.png
+    - lib/assets/cara.png
+    - lib/assets/carb.png
+    - lib/assets/parkingbg.png
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "lib/assets/logo.png"
