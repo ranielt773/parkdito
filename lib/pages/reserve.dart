@@ -106,18 +106,26 @@ class _ReservePageState extends State<ReservePage> {
               padding: const EdgeInsets.fromLTRB(16, 60, 16, 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Icon(Icons.search, color: Color(0xFF3B060A), size: 28),
-                  Text(
-                    "Find Parking",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF3B060A),
+                  children: [
+                    Image.asset(
+                      "lib/assets/search.png", // Palitan ng tamang path
+                      width: 40,
+                      height: 40,
                     ),
-                  ),
-                  Icon(Icons.notifications, color: Color(0xFF3B060A), size: 28),
-                ],
+                    const Text(
+                      "Find Parking",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF3B060A),
+                      ),
+                    ),
+                    Image.asset(
+                      "lib/assets/notif.png", // Palitan ng tamang path
+                      width: 40,
+                      height: 40,
+                    ),
+                  ]
               ),
             ),
 

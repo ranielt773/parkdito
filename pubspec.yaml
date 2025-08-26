@@ -34,6 +34,11 @@ flutter:
     - lib/assets/carb.png
     - lib/assets/carz.png
     - lib/assets/parkingbg.png
+    - lib/assets/back.png
+    - lib/assets/search.png
+    - lib/assets/notif.png
+    - lib/assets/motor.png
+    - lib/assets/minitruck.png
 flutter_icons:
   android: true
   ios: true
