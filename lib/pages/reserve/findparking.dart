@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class FindParkingPage extends StatefulWidget {
-  const FindParkingPage({super.key});
+  final Map<String, dynamic> parkingData;
+
+  const FindParkingPage({super.key, required this.parkingData});
 
   @override
   State<FindParkingPage> createState() => _FindParkingPageState();
@@ -10,54 +12,97 @@ class FindParkingPage extends StatefulWidget {
 class _FindParkingPageState extends State<FindParkingPage> {
   int? selectedSlot;
   String selectedFloor = "Ground";
-
-  final List<String> vehicleTypes = ["Car", "Mini Truck", "Motorcycle"];
   String selectedVehicle = "Car";
 
-  // Different configurations for each vehicle type
-  final Map<String, Map<String, dynamic>> vehicleConfigs = {
-    "Car": {
-      "floors": ["Ground", "2nd Floor", "3rd Floor"],
+  @override
+  void initState() {
+    super.initState();
+    // Set default vehicle type to the first available one
+    if (widget.parkingData["vehicleTypes"].isNotEmpty) {
+      selectedVehicle = widget.parkingData["vehicleTypes"].keys.first;
+    }
+    // Set default floor to the first available one
+    if (widget.parkingData["floors"].isNotEmpty) {
+      selectedFloor = widget.parkingData["floors"][0];
+    }
+  }
+
+  // Get vehicle configuration based on selected vehicle type
+  Map<String, dynamic> getVehicleConfig(String vehicleType) {
+    // Default configuration
+    Map<String, dynamic> defaultConfig = {
+      "floors": ["Ground"],
       "slotsPerFloor": 8,
-      "occupiedSlots": {
-        "Ground": [1, 4, 6],
-        "2nd Floor": [2, 5, 7],
-        "3rd Floor": [3, 8],
-      },
-      "image": "lib/assets/carz.png",
       "slotHeight": 60.0,
       "rows": 4,
       "cols": 2,
-    },
-    "Mini Truck": {
-      "floors": ["Ground"], // Only ground floor for mini trucks
-      "slotsPerFloor": 4,
-      "occupiedSlots": {
-        "Ground": [2],
-      },
-      "image": "lib/assets/minitruck.png",
-      "slotHeight": 70.0, // Slightly taller for trucks
-      "rows": 2,
-      "cols": 2,
-    },
-    "Motorcycle": {
-      "floors": ["Ground", "2nd Floor", "3rd Floor"],
-      "slotsPerFloor": 10,
-      "occupiedSlots": {
-        "Ground": [3, 7],
-        "2nd Floor": [2, 5, 9],
-        "3rd Floor": [1, 4, 8],
-      },
-      "image": "lib/assets/motor.png",
-      "slotHeight": 42.0, // 70% of car height (60 * 0.7 = 42)
-      "rows": 5,
-      "cols": 2,
-    },
-  };
+    };
+
+    // Get available floors for this vehicle type from parking data
+    List<String> availableFloors = [];
+    if (widget.parkingData["floors"] != null) {
+      availableFloors = List<String>.from(widget.parkingData["floors"]);
+    }
+
+    // Get occupied slots from parking data
+    Map<String, List<int>> occupiedSlots = {};
+    if (widget.parkingData["occupiedSlots"] != null &&
+        widget.parkingData["occupiedSlots"][vehicleType] != null) {
+      occupiedSlots = Map<String, List<int>>.from(
+          widget.parkingData["occupiedSlots"][vehicleType]);
+    }
+
+    // Adjust configuration based on vehicle type
+    switch (vehicleType) {
+      case "Car":
+        return {
+          ...defaultConfig,
+          "floors": availableFloors,
+          "slotsPerFloor": 8,
+          "occupiedSlots": occupiedSlots,
+          "image": "assets/carz.png",
+          "slotHeight": 60.0,
+          "rows": 4,
+          "cols": 2,
+        };
+      case "Mini Truck":
+        return {
+          ...defaultConfig,
+          "floors": ["Ground"], // Only ground floor for mini trucks
+          "slotsPerFloor": 4,
+          "occupiedSlots": occupiedSlots,
+          "image": "assets/minitruck.png",
+          "slotHeight": 70.0,
+          "rows": 2,
+          "cols": 2,
+        };
+      case "Motorcycle":
+        return {
+          ...defaultConfig,
+          "floors": availableFloors,
+          "slotsPerFloor": 10,
+          "occupiedSlots": occupiedSlots,
+          "image": "assets/motor.png",
+          "slotHeight": 42.0,
+          "rows": 5,
+          "cols": 2,
+        };
+      default:
+        return defaultConfig;
+    }
+  }
+
+  // Get available vehicle types from parking data
+  List<String> getAvailableVehicleTypes() {
+    if (widget.parkingData["vehicleTypes"] != null) {
+      return widget.parkingData["vehicleTypes"].keys.toList();
+    }
+    return ["Car", "Mini Truck", "Motorcycle"];
+  }
 
   @override
   Widget build(BuildContext context) {
-    final config = vehicleConfigs[selectedVehicle]!;
+    final config = getVehicleConfig(selectedVehicle);
     final currentFloors = List<String>.from(config["floors"] as List);
     final currentOccupiedSlots = (config["occupiedSlots"] as Map<String, List<int>>)[selectedFloor] ?? [];
     final slotHeight = config["slotHeight"] as double;
@@ -90,28 +135,57 @@ class _FindParkingPageState extends State<FindParkingPage> {
                   InkWell(
                     onTap: () => Navigator.pop(context),
                     child: Image.asset(
-                      "lib/assets/back.png",
+                      "assets/back.png",
                       width: 40,
                       height: 40,
                     ),
                   ),
-                  const Text(
-                    "Reserve slot",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF3B060A),
-                    ),
+                  Column(
+                    children: [
+                      const Text(
+                        "Reserve slot",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF3B060A),
+                        ),
+                      ),
+                      Text(
+                        widget.parkingData["name"],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                   InkWell(
                     onTap: () {},
                     child: Image.asset(
-                      "lib/assets/notif.png",
+                      "assets/notif.png",
                       width: 40,
                       height: 40,
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 16),
+
+              // Parking info
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildInfoItem("Total Spaces", widget.parkingData["totalSpaces"].toString()),
+                    _buildInfoItem("Available", widget.parkingData["availableSpaces"].toString()),
+                    _buildInfoItem("Distance", "2.5 km"),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -144,7 +218,7 @@ class _FindParkingPageState extends State<FindParkingPage> {
                 child: Wrap(
                   spacing: 3,
                   alignment: WrapAlignment.center,
-                  children: vehicleTypes.map((type) {
+                  children: getAvailableVehicleTypes().map((type) {
                     bool selected = selectedVehicle == type;
                     return Container(
                       width: 105,
@@ -154,7 +228,7 @@ class _FindParkingPageState extends State<FindParkingPage> {
                             selectedVehicle = type;
                             selectedSlot = null;
                             // Reset to first available floor for this vehicle type
-                            selectedFloor = vehicleConfigs[type]!["floors"][0];
+                            selectedFloor = getVehicleConfig(type)["floors"][0];
                           });
                         },
                         child: Container(
@@ -186,9 +260,11 @@ class _FindParkingPageState extends State<FindParkingPage> {
                   const SizedBox(width: 20),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: selectedSlot != null ? () {
+                        _showReservationDialog();
+                      } : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF02542D),
+                        backgroundColor: selectedSlot != null ? Color(0xFF02542D) : Colors.grey,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
@@ -203,9 +279,9 @@ class _FindParkingPageState extends State<FindParkingPage> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: selectedSlot != null ? () {} : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF3B060A),
+                        backgroundColor: selectedSlot != null ? Color(0xFF3B060A) : Colors.grey,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -224,6 +300,28 @@ class _FindParkingPageState extends State<FindParkingPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoItem(String title, String value) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF3B060A),
+          ),
+        ),
+      ],
     );
   }
 
@@ -343,5 +441,57 @@ class _FindParkingPageState extends State<FindParkingPage> {
         left: BorderSide(color: Colors.black, width: 1),
       );
     }
+  }
+
+  void _showReservationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Reservation"),
+          content: Text("Do you want to reserve slot $selectedSlot on the $selectedFloor floor for your $selectedVehicle?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _showSuccessDialog();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF3B060A),
+              ),
+              child: const Text("Confirm", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Reservation Successful"),
+          content: Text("Your reservation for slot $selectedSlot on the $selectedFloor floor has been confirmed."),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF3B060A),
+              ),
+              child: const Text("OK", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

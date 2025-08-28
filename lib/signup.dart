@@ -14,7 +14,7 @@ class SignupPage extends StatelessWidget {
             height: double.infinity,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("lib/assets/parkingbg.png"),
+                image: AssetImage("assets/parkingbg.png"),
                 fit: BoxFit.cover,
               ),
             ),
@@ -27,7 +27,7 @@ class SignupPage extends StatelessWidget {
             right: 0,
             child: Center(
               child: Image.asset(
-                "lib/assets/logoo.png",
+                "assets/logoo.png",
                 height: 175,
               ),
             ),

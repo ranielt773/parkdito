@@ -44,7 +44,7 @@ class LoginPage extends StatelessWidget {
             height: double.infinity,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("lib/assets/parkingbg.png"),
+                image: AssetImage("assets/parkingbg.png"),
                 fit: BoxFit.cover,
               ),
             ),
@@ -57,7 +57,7 @@ class LoginPage extends StatelessWidget {
             right: 0,
             child: Center(
               child: Image.asset(
-                "lib/assets/logoo.png",
+                "assets/logoo.png",
                 height: 175,
               ),
             ),
@@ -176,9 +176,9 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 15),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       SizedBox(
                         width: 190,
                         height: 40,
@@ -198,8 +198,8 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                  ],
-                ),
+                    ],
+                  ),
                   const SizedBox(height: 15),
 
                   // 🔹 Divider

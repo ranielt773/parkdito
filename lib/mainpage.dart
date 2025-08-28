@@ -25,6 +25,10 @@ class ParkdittoApp extends StatelessWidget {
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
+  // ✅ Ito yung public helper para ma-access sa ibang file
+  static _MainPageState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MainPageState>();
+
   @override
   State<MainPage> createState() => _MainPageState();
 }
@@ -38,8 +42,7 @@ class _MainPageState extends State<MainPage> {
     PlanPage(),
     ProfilePage(),
   ];
-
-  void _onItemTapped(int index) {
+  void onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -51,7 +54,7 @@ class _MainPageState extends State<MainPage> {
       extendBody: true, // para transparent effect sa nav bar
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.all(50),
+        margin: const EdgeInsets.all(45),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: const Color(0xFF3B060A), // dark maroon background
@@ -81,7 +84,7 @@ class _MainPageState extends State<MainPage> {
     final bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => onItemTapped(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.all(10),

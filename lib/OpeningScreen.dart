@@ -68,7 +68,7 @@ class _OpeningScreenState extends State<OpeningScreen>
             const Spacer(),
 
             // Logo
-            Image.asset('lib/assets/logo.png', width: 200),
+            Image.asset('assets/logo.png', width: 200),
             const SizedBox(height: 10),
             const Spacer(),
 
@@ -80,11 +80,11 @@ class _OpeningScreenState extends State<OpeningScreen>
                 children: [
                   Transform.translate(
                   offset: Offset(_carBAnimation.value, -10),
-                  child: Image.asset("lib/assets/carb.png", width: 290),
+                  child: Image.asset("assets/carb.png", width: 290),
                  ),
                   Transform.translate(
                     offset: Offset(_carAAnimation.value, 0),
-                    child: Image.asset("lib/assets/cara.png", width: 320),
+                    child: Image.asset("assets/cara.png", width: 320),
 
 
                   ),

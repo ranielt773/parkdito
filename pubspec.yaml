@@ -24,22 +24,34 @@ dev_dependencies:
   latlong2: ^0.9.0
   geolocator: ^12.0.0
   url_launcher: ^6.1.10
+  sensors_plus: ^6.0.1
 flutter:
   uses-material-design: true
   assets:
-    - lib/assets/logo.png
-    - lib/assets/logoo.png
-    - lib/assets/ub.png
-    - lib/assets/cara.png
-    - lib/assets/carb.png
-    - lib/assets/carz.png
-    - lib/assets/parkingbg.png
-    - lib/assets/back.png
-    - lib/assets/search.png
-    - lib/assets/notif.png
-    - lib/assets/motor.png
-    - lib/assets/minitruck.png
+    - assets/logo.png
+    - assets/user_location.png
+    - assets/logoo.png
+    - assets/ub.png
+    - assets/back.png
+    - assets/cara.png
+    - assets/car_pin.png
+    - assets/carb.png
+    - assets/carz.png
+    - assets/search.png
+    - assets/notif.png
+    - assets/motor.png
+    - assets/search.png
+    - assets/minitruck.png
+    - assets/parkingbg.png
+    - assets/farmlae_parking.png
+    - assets/cctv_icon.png
+    - assets/victoria.png
+    - assets/bay.png
+    - assets/calauan.png
+    - assets/pamilihan.png
 flutter_icons:
   android: true
   ios: true
-  image_path: "lib/assets/logo.png"
+  image_path: "assets/logo.png"
+  adaptive_icon_background: "#FDF7D887" # Optional: set background color
+  adaptive_icon_foreground: "assets/logo.png" # For adaptive icons
