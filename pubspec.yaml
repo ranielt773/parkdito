@@ -12,6 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   slide_to_act: ^2.0.1
+  intl: ^0.18.0
+
 
   cupertino_icons: ^1.0.8
 
@@ -49,6 +51,18 @@ flutter:
     - assets/bay.png
     - assets/calauan.png
     - assets/pamilihan.png
+    - assets/caretaker_icon.png
+    - assets/insurance_icon.png
+    - assets/carwash_icon.png
+    - assets/storm_icon.png
+    - assets/gcash_icon.png
+    - assets/paymaya_icon.png
+    - assets/qr_icon.png
+    - assets/parkditto_icon.png
+    - assets/messenger_icon.png
+    - assets/bank_icon.png
+    - assets/back_icon.png
+    - assets/checkMark_icon.png
 flutter_icons:
   android: true
   ios: true

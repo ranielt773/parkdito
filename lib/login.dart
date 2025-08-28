@@ -52,13 +52,13 @@ class LoginPage extends StatelessWidget {
 
           // 🔹 Logo at the top
           Positioned(
-            top: MediaQuery.of(context).padding.top + 10,
+            top: MediaQuery.of(context).padding.top + 16,
             left: 0,
             right: 0,
             child: Center(
               child: Image.asset(
                 "assets/logoo.png",
-                height: 175,
+                height: 150,
               ),
             ),
           ),

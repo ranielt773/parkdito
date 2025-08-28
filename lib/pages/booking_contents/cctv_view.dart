@@ -16,26 +16,29 @@ class _CCTVViewPageState extends State<CCTVViewPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: Container(
+          margin: const EdgeInsets.only(top: 30),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           color: Colors.white,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Search button
+              // Back button (replaces search)
               InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                },
                 child: Container(
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
-                    color: Color(0xFF3B060A),
+                    color: const Color(0xFF3B060A),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
-                    Icons.search,
+                    Icons.arrow_back,
                     color: Colors.white,
-                    size: 22,
+                    size: 22, // 👈 matches notification icon size
                   ),
                 ),
               ),

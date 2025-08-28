@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'cctv_view.dart';
+import 'plan.dart';
 
 class BookingStatusPage extends StatefulWidget {
   final String parkingName;
@@ -33,36 +34,40 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80), // taller app bar
         child: Container(
+          margin: const EdgeInsets.only(top: 30),
           padding: const EdgeInsets.symmetric(
             horizontal: 12,
             vertical: 10, // 👈 add extra top & bottom padding
           ),
           color: Colors.white,
-          child: Row(
+          child:
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Search button
+              // Back button (replaces search)
               InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {},
+                borderRadius: BorderRadius.circular(5),
+                onTap: () {
+                  Navigator.pop(context);
+                },
                 child: Container(
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
-                    color: Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFF3B060A),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: const Icon(
-                    Icons.search,
+                    Icons.arrow_back,
                     color: Colors.white,
-                    size: 22,
+                    size: 22, // 👈 matches notification icon size
                   ),
                 ),
               ),
 
               // Title
               const Text(
-                "Booking",
+                "Booking Status",
                 style: TextStyle(
                   color: Color(0xFF3B060A),
                   fontWeight: FontWeight.bold,
@@ -72,14 +77,14 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
 
               // Bell button
               InkWell(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(5),
                 onTap: () {},
                 child: Container(
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
                     color: Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: const Icon(
                     Icons.notifications,
@@ -129,7 +134,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                   return _buildStatusContent(
                     "2nd Floor Parking",
                     widget.location,
-                    "B12",
+                    "Slot B12",
                     widget.dateRange,
                     "10 days 8 hours 43 mins 11 secs",
                   );
@@ -137,7 +142,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                   return _buildStatusContent(
                     "3rd Floor Parking",
                     widget.location,
-                    "C8",
+                    "Slot C8",
                     widget.dateRange,
                     "5 days 3 hours 49 mins 23 secs",
                   );
@@ -157,7 +162,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFF3B060A) : Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: Text(
         text,
@@ -183,7 +188,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Color(0xFFFDF7D8),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,10 +202,10 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                       color: const Color(0xFF3B060A),
                       width: 2,
                     ),
-                    borderRadius: BorderRadius.circular(8), // not so rounded
+                    borderRadius: BorderRadius.circular(5), // not so rounded
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(5),
                     child: Image.asset(
                       "assets/farmlae_parking.png",
                       height: 180,
@@ -221,7 +226,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                     child: const Text(
                       "Reserved",
@@ -248,7 +253,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: Image.asset(
                         "assets/cctv_icon.png",
@@ -305,11 +310,11 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFDF7D8),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(5),
                       border: Border.all(color: Color(0xFF3B060A)),
                     ),
                     child: Text(
-                      "Slot $slotNumber",
+                      "$slotNumber",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
@@ -348,7 +353,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                 constraints: const BoxConstraints(minWidth: 230),
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(5),
                 ),
                 child: Column(
                   children: [
@@ -381,7 +386,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
@@ -399,11 +404,16 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF3B060A),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15), // same radius
+                        borderRadius: BorderRadius.circular(5), // same radius
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PlanPage()),
+                      );
+                    },
                     child: const Text(
                       "Extend",
                       style: TextStyle(color: Colors.white, fontSize: 16),
@@ -420,7 +430,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: const Color(0xFFFDF7D8),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(5),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,10 +455,17 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                             vertical: 8,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PlanPage(),
+                            ),
+                          );
+                        },
                         child: const Text(
                           "View Plan",
                           style: TextStyle(color: Colors.white),
@@ -463,10 +480,22 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: const [
-                      _PerkItem(icon: Icons.videocam, label: "CCTV"),
-                      _PerkItem(icon: Icons.person, label: "Caretaker"),
-                      _PerkItem(icon: Icons.security, label: "Insurance"),
-                      _PerkItem(icon: Icons.local_car_wash, label: "Carwash"),
+                      _PerkItem(
+                        imagePath: "assets/cctv_icon.png",
+                        label: "CCTV",
+                      ),
+                      _PerkItem(
+                        imagePath: "assets/caretaker_icon.png",
+                        label: "Caretaker",
+                      ),
+                      _PerkItem(
+                        imagePath: "assets/insurance_icon.png",
+                        label: "Insurance",
+                      ),
+                      _PerkItem(
+                        imagePath: "assets/carwash_icon.png",
+                        label: "Carwash",
+                      ),
                     ],
                   ),
                 ],
@@ -479,12 +508,11 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
   }
 }
 
-// Custom Perk Item widget
 class _PerkItem extends StatelessWidget {
-  final IconData icon;
+  final String imagePath;
   final String label;
 
-  const _PerkItem({required this.icon, required this.label});
+  const _PerkItem({required this.imagePath, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -494,9 +522,14 @@ class _PerkItem extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Color(0xFF3B060A),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(28),
           ),
-          child: Icon(icon, color: Colors.white, size: 24),
+          child: Image.asset(
+            imagePath,
+            height: 28,
+            width: 28,
+            color: Colors.white, // keeps icons white-like
+          ),
         ),
         const SizedBox(height: 6),
         Text(label, style: const TextStyle(color: Color(0xFF3B060A))),

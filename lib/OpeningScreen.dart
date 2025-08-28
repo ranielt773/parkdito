@@ -68,7 +68,7 @@ class _OpeningScreenState extends State<OpeningScreen>
             const Spacer(),
 
             // Logo
-            Image.asset('assets/logo.png', width: 200),
+            Image.asset('assets/logo.png', width: 150),
             const SizedBox(height: 10),
             const Spacer(),
 

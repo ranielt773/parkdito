@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:parkditto/pages/booking_contents/plan.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'reserve/findparking.dart';
@@ -873,7 +874,12 @@ class _ReservePageState extends State<ReservePage> {
                       width: 90,
                       height: 26,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => FindParkingPage(parkingData: spot)),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF3B060A),
                           padding: const EdgeInsets.symmetric(vertical: 2),

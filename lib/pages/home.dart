@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parkditto/mainpage.dart';
+import 'package:parkditto/pages/reserve/findparking.dart';
 import 'reserve.dart'; // Add this import
 
 class HomePage extends StatelessWidget {
@@ -24,86 +25,320 @@ class HomePage extends StatelessWidget {
   // Default image if specific image is not available
   final String defaultParkingImage = "assets/parkingbg.png";
 
-  // Helper function to get image for a parking spot
-  String _getParkingImage(int parkingId) {
-    return parkingImages[parkingId] ?? defaultParkingImage;
-  }
-
-  // ✅ Sample data (updated with IDs and individual images)
+  // ✅ Sample parking data with the same structure as ReservePage
   final List<Map<String, dynamic>> parkingSpots = const [
     {
       "id": 1,
       "name": "Calauan Public Market Parking",
       "address": "Public Market, Calauan, Laguna",
-      "spaces": 10,
+      "totalSpaces": 50,
+      "availableSpaces": 10,
+      "vehicleTypes": {
+        "Car": {"total": 30, "available": 8},
+        "Motorcycle": {"total": 20, "available": 2},
+      },
+      "floors": ["Ground", "2nd Floor"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15],
+          "2nd Floor": [2, 4, 6, 8]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5, 7, 9],
+          "2nd Floor": [2, 4]
+        }
+      }
     },
     {
       "id": 2,
       "name": "Calauan Municipal Hall Parking",
       "address": "Municipal Hall Compound, Calauan, Laguna",
-      "spaces": 15,
+      "totalSpaces": 80,
+      "availableSpaces": 15,
+      "vehicleTypes": {
+        "Car": {"total": 50, "available": 10},
+        "Mini Truck": {"total": 20, "available": 5},
+        "Motorcycle": {"total": 10, "available": 0},
+      },
+      "floors": ["Ground"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49]
+        },
+        "Mini Truck": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15]
+        },
+        "Motorcycle": {
+          "Ground": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        }
+      }
     },
     {
       "id": 3,
       "name": "Bay Town Center Parking",
       "address": "Bay Town Center, Bay, Laguna",
-      "spaces": 8,
+      "totalSpaces": 40,
+      "availableSpaces": 8,
+      "vehicleTypes": {
+        "Car": {"total": 30, "available": 5},
+        "Motorcycle": {"total": 10, "available": 3},
+      },
+      "floors": ["Ground", "2nd Floor", "3rd Floor"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 2, 5, 7, 9],
+          "2nd Floor": [2, 4, 6, 8, 10],
+          "3rd Floor": [1, 3, 5]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5],
+          "2nd Floor": [2, 4],
+          "3rd Floor": [1]
+        }
+      }
     },
     {
       "id": 4,
       "name": "Victoria Plaza Parking",
       "address": "Victoria Plaza, Victoria, Laguna",
-      "spaces": 12,
+      "totalSpaces": 60,
+      "availableSpaces": 12,
+      "vehicleTypes": {
+        "Car": {"total": 40, "available": 8},
+        "Mini Truck": {"total": 10, "available": 2},
+        "Motorcycle": {"total": 10, "available": 2},
+      },
+      "floors": ["Ground", "2nd Floor"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15],
+          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16]
+        },
+        "Mini Truck": {
+          "Ground": [1, 3, 5, 7],
+          "2nd Floor": [2, 4]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5, 7],
+          "2nd Floor": [2, 4]
+        }
+      }
     },
     {
       "id": 5,
       "name": "Nagcarlan Town Square Parking",
       "address": "Town Square, Nagcarlan, Laguna",
-      "spaces": 7,
+      "totalSpaces": 35,
+      "availableSpaces": 7,
+      "vehicleTypes": {
+        "Car": {"total": 25, "available": 5},
+        "Motorcycle": {"total": 10, "available": 2},
+      },
+      "floors": ["Ground"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5, 7]
+        }
+      }
     },
     {
       "id": 6,
       "name": "Rizal Municipal Parking",
       "address": "Municipal Building, Rizal, Laguna",
-      "spaces": 9,
+      "totalSpaces": 45,
+      "availableSpaces": 9,
+      "vehicleTypes": {
+        "Car": {"total": 30, "available": 6},
+        "Mini Truck": {"total": 5, "available": 1},
+        "Motorcycle": {"total": 10, "available": 2},
+      },
+      "floors": ["Ground", "2nd Floor"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13],
+          "2nd Floor": [2, 4, 6, 8, 10]
+        },
+        "Mini Truck": {
+          "Ground": [1, 3],
+          "2nd Floor": [2]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5, 7],
+          "2nd Floor": [2, 4]
+        }
+      }
     },
     {
       "id": 7,
       "name": "Luisiana Public Market Parking",
       "address": "Public Market, Luisiana, Laguna",
-      "spaces": 6,
+      "totalSpaces": 30,
+      "availableSpaces": 6,
+      "vehicleTypes": {
+        "Car": {"total": 20, "available": 4},
+        "Motorcycle": {"total": 10, "available": 2},
+      },
+      "floors": ["Ground"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5, 7]
+        }
+      }
     },
     {
       "id": 8,
       "name": "Pagsanjan Town Plaza Parking",
       "address": "Town Plaza, Pagsanjan, Laguna",
-      "spaces": 15,
+      "totalSpaces": 75,
+      "availableSpaces": 15,
+      "vehicleTypes": {
+        "Car": {"total": 50, "available": 10},
+        "Mini Truck": {"total": 15, "available": 3},
+        "Motorcycle": {"total": 10, "available": 2},
+      },
+      "floors": ["Ground", "2nd Floor", "3rd Floor"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15],
+          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16],
+          "3rd Floor": [1, 3, 5, 7, 9]
+        },
+        "Mini Truck": {
+          "Ground": [1, 3, 5],
+          "2nd Floor": [2, 4],
+          "3rd Floor": [1]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5],
+          "2nd Floor": [2, 4],
+          "3rd Floor": [1]
+        }
+      }
     },
     {
       "id": 9,
       "name": "Cabuyao City Mall Parking",
       "address": "City Mall, Cabuyao, Laguna",
-      "spaces": 25,
+      "totalSpaces": 125,
+      "availableSpaces": 25,
+      "vehicleTypes": {
+        "Car": {"total": 80, "available": 15},
+        "Mini Truck": {"total": 25, "available": 5},
+        "Motorcycle": {"total": 20, "available": 5},
+      },
+      "floors": ["Ground", "2nd Floor", "3rd Floor", "4th Floor"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19],
+          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+          "3rd Floor": [1, 3, 5, 7, 9, 11, 13, 15],
+          "4th Floor": [2, 4, 6, 8, 10, 12]
+        },
+        "Mini Truck": {
+          "Ground": [1, 3, 5, 7, 9],
+          "2nd Floor": [2, 4, 6, 8],
+          "3rd Floor": [1, 3, 5],
+          "4th Floor": [2, 4]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5, 7, 9],
+          "2nd Floor": [2, 4, 6, 8],
+          "3rd Floor": [1, 3, 5],
+          "4th Floor": [2, 4]
+        }
+      }
     },
     {
       "id": 10,
       "name": "San Pablo City Parking Complex",
       "address": "City Complex, San Pablo City, Laguna",
-      "spaces": 30,
+      "totalSpaces": 150,
+      "availableSpaces": 30,
+      "vehicleTypes": {
+        "Car": {"total": 100, "available": 20},
+        "Mini Truck": {"total": 30, "available": 6},
+        "Motorcycle": {"total": 20, "available": 4},
+      },
+      "floors": ["Ground", "2nd Floor", "3rd Floor"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29],
+          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30],
+          "3rd Floor": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+        },
+        "Mini Truck": {
+          "Ground": [1, 3, 5, 7, 9, 11],
+          "2nd Floor": [2, 4, 6, 8, 10, 12],
+          "3rd Floor": [1, 3, 5]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5, 7, 9],
+          "2nd Floor": [2, 4, 6, 8, 10],
+          "3rd Floor": [1, 3]
+        }
+      }
     },
     {
       "id": 11,
       "name": "Alaminos Town Center Parking",
       "address": "Town Center, Alaminos, Laguna",
-      "spaces": 11,
+      "totalSpaces": 55,
+      "availableSpaces": 11,
+      "vehicleTypes": {
+        "Car": {"total": 40, "available": 8},
+        "Motorcycle": {"total": 15, "available": 3},
+      },
+      "floors": ["Ground", "2nd Floor"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31],
+          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5, 7, 9, 11],
+          "2nd Floor": [2, 4, 6]
+        }
+      }
     },
     {
       "id": 12,
       "name": "Sta. Cruz Municipal Parking",
       "address": "Municipal Building, Sta. Cruz, Laguna",
-      "spaces": 18,
+      "totalSpaces": 90,
+      "availableSpaces": 18,
+      "vehicleTypes": {
+        "Car": {"total": 60, "available": 12},
+        "Mini Truck": {"total": 20, "available": 4},
+        "Motorcycle": {"total": 10, "available": 2},
+      },
+      "floors": ["Ground", "2nd Floor"],
+      "occupiedSlots": {
+        "Car": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29],
+          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+        },
+        "Mini Truck": {
+          "Ground": [1, 3, 5, 7, 9, 11, 13],
+          "2nd Floor": [2, 4, 6, 8]
+        },
+        "Motorcycle": {
+          "Ground": [1, 3, 5, 7],
+          "2nd Floor": [2, 4]
+        }
+      }
     },
   ];
+
+  // Helper function to get image for a parking spot
+  String _getParkingImage(int parkingId) {
+    return parkingImages[parkingId] ?? defaultParkingImage;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,84 +421,92 @@ class HomePage extends StatelessWidget {
                     final spot = parkingSpots[index];
                     final imagePath = _getParkingImage(spot["id"]);
 
-                    return Container(
-                      width: 266,
-                      margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xFF3B060A), width: 2),
-                        borderRadius: BorderRadius.circular(5),
-                        color: Colors.white,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(5)),
-                                child: Image.asset(
-                                  imagePath,
-                                  height: 150,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    // Fallback to default image if specific image is not found
-                                    return Image.asset(
-                                      defaultParkingImage,
-                                      height: 150,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                ),
-                              ),
-                              Positioned(
-                                right: 6,
-                                bottom: 6,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFFDF7D8),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    "${spot["spaces"]} free spaces",
-                                    style: const TextStyle(
-                                      color: Color(0xFF3B060A),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FindParkingPage(parkingData: spot)),
+                        );
+                      },
+                      child: Container(
+                        width: 266,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xFF3B060A), width: 2),
+                          borderRadius: BorderRadius.circular(5),
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Stack(
                               children: [
-                                Text(
-                                  spot["name"],
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF3B060A),
-                                      fontSize: 16
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(5)),
+                                  child: Image.asset(
+                                    imagePath,
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      // Fallback to default image if specific image is not found
+                                      return Image.asset(
+                                        defaultParkingImage,
+                                        height: 150,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
                                   ),
                                 ),
-                                Text(
-                                  spot["address"],
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.black54,
+                                Positioned(
+                                  right: 6,
+                                  bottom: 6,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFFDF7D8),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      "${spot["availableSpaces"]} free spaces",
+                                      style: const TextStyle(
+                                        color: Color(0xFF3B060A),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          )
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    spot["name"],
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF3B060A),
+                                        fontSize: 16
+                                    ),
+                                  ),
+                                  Text(
+                                    spot["address"],
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -338,54 +581,62 @@ class HomePage extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 2, // Show 6 favorite spots
+                itemCount: 6, // Show 6 favorite spots
                 itemBuilder: (context, index) {
                   final spot = parkingSpots[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFD9D9D9).withOpacity(0.3),
-                    ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(12),
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: Image.asset(
-                          _getParkingImage(spot["id"]),
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              defaultParkingImage,
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            );
-                          },
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => FindParkingPage(parkingData: spot)),
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFD9D9D9).withOpacity(0.3),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(12),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.asset(
+                            _getParkingImage(spot["id"]),
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                defaultParkingImage,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      title: Text(
-                        spot["name"],
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF3B060A)),
-                      ),
-                      subtitle: Text(
-                        spot["address"],
-                        style: const TextStyle(color: Colors.black54),
-                      ),
-                      trailing: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFFDF7D8),
-                        ),
-                        child: Text(
-                          "${spot["spaces"]} free spaces",
+                        title: Text(
+                          spot["name"],
                           style: const TextStyle(
-                            color: Color(0xFF3B060A),
-                            fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF3B060A)),
+                        ),
+                        subtitle: Text(
+                          spot["address"],
+                          style: const TextStyle(color: Colors.black54),
+                        ),
+                        trailing: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFFDF7D8),
+                          ),
+                          child: Text(
+                            "${spot["availableSpaces"]} free spaces",
+                            style: const TextStyle(
+                              color: Color(0xFF3B060A),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),

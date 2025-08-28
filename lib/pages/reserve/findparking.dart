@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:parkditto/pages/booking_contents/plan.dart';
+import 'package:parkditto/pages/booking_contents/reservePlan.dart';
 
 class FindParkingPage extends StatefulWidget {
   final Map<String, dynamic> parkingData;
@@ -261,7 +263,10 @@ class _FindParkingPageState extends State<FindParkingPage> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: selectedSlot != null ? () {
-                        _showReservationDialog();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ReservePlanPage()),
+                        );
                       } : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: selectedSlot != null ? Color(0xFF02542D) : Colors.grey,
@@ -279,7 +284,12 @@ class _FindParkingPageState extends State<FindParkingPage> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: selectedSlot != null ? () {} : null,
+                      onPressed: selectedSlot != null ? () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => PlanPage()),
+                        );
+                      } : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: selectedSlot != null ? Color(0xFF3B060A) : Colors.grey,
                         padding: const EdgeInsets.symmetric(vertical: 10),
