@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'OpeningScreen.dart';
+import 'login.dart';
+import 'mainpage.dart';
+import 'api/api_service.dart';
 
 void main() {
   runApp(const ParkDittoApp());
@@ -29,12 +32,26 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Wait 2 seconds then go to Opening Screen
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    bool isLoggedIn = await ApiService.isLoggedIn();
+
     Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const OpeningScreen()),
-      );
+      if (!mounted) return;
+
+      if (isLoggedIn) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainPage()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const OpeningScreen()),
+        );
+      }
     });
   }
 

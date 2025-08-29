@@ -20,12 +20,14 @@ class _FindParkingPageState extends State<FindParkingPage> {
   void initState() {
     super.initState();
     // Set default vehicle type to the first available one
-    if (widget.parkingData["vehicleTypes"].isNotEmpty) {
-      selectedVehicle = widget.parkingData["vehicleTypes"].keys.first;
+    if (widget.parkingData["vehicle_types"] != null &&
+        (widget.parkingData["vehicle_types"] as Map<String, dynamic>).isNotEmpty) {
+      selectedVehicle = (widget.parkingData["vehicle_types"] as Map<String, dynamic>).keys.first;
     }
     // Set default floor to the first available one
-    if (widget.parkingData["floors"].isNotEmpty) {
-      selectedFloor = widget.parkingData["floors"][0];
+    if (widget.parkingData["floors"] != null &&
+        (widget.parkingData["floors"] as List<dynamic>).isNotEmpty) {
+      selectedFloor = (widget.parkingData["floors"] as List<dynamic>)[0];
     }
   }
 
@@ -47,11 +49,21 @@ class _FindParkingPageState extends State<FindParkingPage> {
     }
 
     // Get occupied slots from parking data
+    // Get occupied slots from parking data
     Map<String, List<int>> occupiedSlots = {};
-    if (widget.parkingData["occupiedSlots"] != null &&
-        widget.parkingData["occupiedSlots"][vehicleType] != null) {
-      occupiedSlots = Map<String, List<int>>.from(
-          widget.parkingData["occupiedSlots"][vehicleType]);
+    if (widget.parkingData["occupied_slots"] != null &&
+        widget.parkingData["occupied_slots"][vehicleType] != null) {
+      // Convert List<dynamic> to List<int>
+      var occupiedData = widget.parkingData["occupied_slots"][vehicleType];
+      if (occupiedData is Map) {
+        occupiedSlots = Map<String, List<int>>.from(occupiedData.map((key, value) {
+          // Convert each List<dynamic> to List<int>
+          if (value is List) {
+            return MapEntry(key.toString(), List<int>.from(value));
+          }
+          return MapEntry(key.toString(), <int>[]);
+        }));
+      }
     }
 
     // Adjust configuration based on vehicle type
@@ -96,8 +108,8 @@ class _FindParkingPageState extends State<FindParkingPage> {
 
   // Get available vehicle types from parking data
   List<String> getAvailableVehicleTypes() {
-    if (widget.parkingData["vehicleTypes"] != null) {
-      return widget.parkingData["vehicleTypes"].keys.toList();
+    if (widget.parkingData["vehicle_types"] != null) {
+      return (widget.parkingData["vehicle_types"] as Map<String, dynamic>).keys.toList();
     }
     return ["Car", "Mini Truck", "Motorcycle"];
   }
@@ -183,8 +195,8 @@ class _FindParkingPageState extends State<FindParkingPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildInfoItem("Total Spaces", widget.parkingData["totalSpaces"].toString()),
-                    _buildInfoItem("Available", widget.parkingData["availableSpaces"].toString()),
+                    _buildInfoItem("Total Spaces", widget.parkingData["total_spaces"].toString()),
+                    _buildInfoItem("Available", widget.parkingData["available_spaces"].toString()),
                     _buildInfoItem("Distance", "2.5 km"),
                   ],
                 ),
@@ -286,8 +298,8 @@ class _FindParkingPageState extends State<FindParkingPage> {
                     child: ElevatedButton(
                       onPressed: selectedSlot != null ? () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => PlanPage()),
+                          context,
+                          MaterialPageRoute(builder: (context) => PlanPage()),
                         );
                       } : null,
                       style: ElevatedButton.styleFrom(

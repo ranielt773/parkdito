@@ -8,7 +8,8 @@ import 'package:parkditto/pages/booking_contents/plan.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'reserve/findparking.dart';
-import 'reserve/compass_handler.dart'; // Add this import
+import 'reserve/compass_handler.dart';
+import 'package:parkditto/api/api_service.dart'; // Import the ApiService
 
 class ReservePage extends StatefulWidget {
   const ReservePage({super.key});
@@ -44,333 +45,12 @@ class _ReservePageState extends State<ReservePage> {
   // Default image if specific image is not available
   final String defaultParkingImage = "assets/parkingbg.png";
 
-  // ✅ Sample data with detailed parking information
-  final List<Map<String, dynamic>> parkingSpots = [
-    {
-      "id": 1,
-      "name": "Calauan Public Market Parking",
-      "location": LatLng(14.1487, 121.3158),
-      "address": "Public Market, Calauan, Laguna",
-      "totalSpaces": 50,
-      "availableSpaces": 10,
-      "vehicleTypes": {
-        "Car": {"total": 30, "available": 8},
-        "Motorcycle": {"total": 20, "available": 2},
-      },
-      "floors": ["Ground", "2nd Floor"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15],
-          "2nd Floor": [2, 4, 6, 8]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5, 7, 9],
-          "2nd Floor": [2, 4]
-        }
-      }
-    },
-    {
-      "id": 2,
-      "name": "Calauan Municipal Hall Parking",
-      "location": LatLng(14.1492, 121.3163),
-      "address": "Municipal Hall Compound, Calauan, Laguna",
-      "totalSpaces": 80,
-      "availableSpaces": 15,
-      "vehicleTypes": {
-        "Car": {"total": 50, "available": 10},
-        "Mini Truck": {"total": 20, "available": 5},
-        "Motorcycle": {"total": 10, "available": 0},
-      },
-      "floors": ["Ground"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49]
-        },
-        "Mini Truck": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15]
-        },
-        "Motorcycle": {
-          "Ground": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        }
-      }
-    },
-    {
-      "id": 3,
-      "name": "Bay Town Center Parking",
-      "location": LatLng(14.1833, 121.2833),
-      "address": "Bay Town Center, Bay, Laguna",
-      "totalSpaces": 40,
-      "availableSpaces": 8,
-      "vehicleTypes": {
-        "Car": {"total": 30, "available": 5},
-        "Motorcycle": {"total": 10, "available": 3},
-      },
-      "floors": ["Ground", "2nd Floor", "3rd Floor"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 2, 5, 7, 9],
-          "2nd Floor": [2, 4, 6, 8, 10],
-          "3rd Floor": [1, 3, 5]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5],
-          "2nd Floor": [2, 4],
-          "3rd Floor": [1]
-        }
-      }
-    },
-    {
-      "id": 4,
-      "name": "Victoria Plaza Parking",
-      "location": LatLng(14.2167, 121.3167),
-      "address": "Victoria Plaza, Victoria, Laguna",
-      "totalSpaces": 60,
-      "availableSpaces": 12,
-      "vehicleTypes": {
-        "Car": {"total": 40, "available": 8},
-        "Mini Truck": {"total": 10, "available": 2},
-        "Motorcycle": {"total": 10, "available": 2},
-      },
-      "floors": ["Ground", "2nd Floor"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15],
-          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16]
-        },
-        "Mini Truck": {
-          "Ground": [1, 3, 5, 7],
-          "2nd Floor": [2, 4]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5, 7],
-          "2nd Floor": [2, 4]
-        }
-      }
-    },
-    {
-      "id": 5,
-      "name": "Nagcarlan Town Square Parking",
-      "location": LatLng(14.1364, 121.4164),
-      "address": "Town Square, Nagcarlan, Laguna",
-      "totalSpaces": 35,
-      "availableSpaces": 7,
-      "vehicleTypes": {
-        "Car": {"total": 25, "available": 5},
-        "Motorcycle": {"total": 10, "available": 2},
-      },
-      "floors": ["Ground"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5, 7]
-        }
-      }
-    },
-    {
-      "id": 6,
-      "name": "Rizal Municipal Parking",
-      "location": LatLng(14.1083, 121.3917),
-      "address": "Municipal Building, Rizal, Laguna",
-      "totalSpaces": 45,
-      "availableSpaces": 9,
-      "vehicleTypes": {
-        "Car": {"total": 30, "available": 6},
-        "Mini Truck": {"total": 5, "available": 1},
-        "Motorcycle": {"total": 10, "available": 2},
-      },
-      "floors": ["Ground", "2nd Floor"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13],
-          "2nd Floor": [2, 4, 6, 8, 10]
-        },
-        "Mini Truck": {
-          "Ground": [1, 3],
-          "2nd Floor": [2]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5, 7],
-          "2nd Floor": [2, 4]
-        }
-      }
-    },
-    {
-      "id": 7,
-      "name": "Luisiana Public Market Parking",
-      "location": LatLng(14.1850, 121.5100),
-      "address": "Public Market, Luisiana, Laguna",
-      "totalSpaces": 30,
-      "availableSpaces": 6,
-      "vehicleTypes": {
-        "Car": {"total": 20, "available": 4},
-        "Motorcycle": {"total": 10, "available": 2},
-      },
-      "floors": ["Ground"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5, 7]
-        }
-      }
-    },
-    {
-      "id": 8,
-      "name": "Pagsanjan Town Plaza Parking",
-      "location": LatLng(14.2731, 121.4547),
-      "address": "Town Plaza, Pagsanjan, Laguna",
-      "totalSpaces": 75,
-      "availableSpaces": 15,
-      "vehicleTypes": {
-        "Car": {"total": 50, "available": 10},
-        "Mini Truck": {"total": 15, "available": 3},
-        "Motorcycle": {"total": 10, "available": 2},
-      },
-      "floors": ["Ground", "2nd Floor", "3rd Floor"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15],
-          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16],
-          "3rd Floor": [1, 3, 5, 7, 9]
-        },
-        "Mini Truck": {
-          "Ground": [1, 3, 5],
-          "2nd Floor": [2, 4],
-          "3rd Floor": [1]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5],
-          "2nd Floor": [2, 4],
-          "3rd Floor": [1]
-        }
-      }
-    },
-    {
-      "id": 9,
-      "name": "Cabuyao City Mall Parking",
-      "location": LatLng(14.2750, 121.1250),
-      "address": "City Mall, Cabuyao, Laguna",
-      "totalSpaces": 125,
-      "availableSpaces": 25,
-      "vehicleTypes": {
-        "Car": {"total": 80, "available": 15},
-        "Mini Truck": {"total": 25, "available": 5},
-        "Motorcycle": {"total": 20, "available": 5},
-      },
-      "floors": ["Ground", "2nd Floor", "3rd Floor", "4th Floor"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19],
-          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
-          "3rd Floor": [1, 3, 5, 7, 9, 11, 13, 15],
-          "4th Floor": [2, 4, 6, 8, 10, 12]
-        },
-        "Mini Truck": {
-          "Ground": [1, 3, 5, 7, 9],
-          "2nd Floor": [2, 4, 6, 8],
-          "3rd Floor": [1, 3, 5],
-          "4th Floor": [2, 4]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5, 7, 9],
-          "2nd Floor": [2, 4, 6, 8],
-          "3rd Floor": [1, 3, 5],
-          "4th Floor": [2, 4]
-        }
-      }
-    },
-    {
-      "id": 10,
-      "name": "San Pablo City Parking Complex",
-      "location": LatLng(14.0667, 121.3250),
-      "address": "City Complex, San Pablo City, Laguna",
-      "totalSpaces": 150,
-      "availableSpaces": 30,
-      "vehicleTypes": {
-        "Car": {"total": 100, "available": 20},
-        "Mini Truck": {"total": 30, "available": 6},
-        "Motorcycle": {"total": 20, "available": 4},
-      },
-      "floors": ["Ground", "2nd Floor", "3rd Floor"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29],
-          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30],
-          "3rd Floor": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
-        },
-        "Mini Truck": {
-          "Ground": [1, 3, 5, 7, 9, 11],
-          "2nd Floor": [2, 4, 6, 8, 10, 12],
-          "3rd Floor": [1, 3, 5]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5, 7, 9],
-          "2nd Floor": [2, 4, 6, 8, 10],
-          "3rd Floor": [1, 3]
-        }
-      }
-    },
-    {
-      "id": 11,
-      "name": "Alaminos Town Center Parking",
-      "location": LatLng(14.0639, 121.2464),
-      "address": "Town Center, Alaminos, Laguna",
-      "totalSpaces": 55,
-      "availableSpaces": 11,
-      "vehicleTypes": {
-        "Car": {"total": 40, "available": 8},
-        "Motorcycle": {"total": 15, "available": 3},
-      },
-      "floors": ["Ground", "2nd Floor"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31],
-          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5, 7, 9, 11],
-          "2nd Floor": [2, 4, 6]
-        }
-      }
-    },
-    {
-      "id": 12,
-      "name": "Sta. Cruz Municipal Parking",
-      "location": LatLng(14.2833, 121.4167),
-      "address": "Municipal Building, Sta. Cruz, Laguna",
-      "totalSpaces": 90,
-      "availableSpaces": 18,
-      "vehicleTypes": {
-        "Car": {"total": 60, "available": 12},
-        "Mini Truck": {"total": 20, "available": 4},
-        "Motorcycle": {"total": 10, "available": 2},
-      },
-      "floors": ["Ground", "2nd Floor"],
-      "occupiedSlots": {
-        "Car": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29],
-          "2nd Floor": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
-        },
-        "Mini Truck": {
-          "Ground": [1, 3, 5, 7, 9, 11, 13],
-          "2nd Floor": [2, 4, 6, 8]
-        },
-        "Motorcycle": {
-          "Ground": [1, 3, 5, 7],
-          "2nd Floor": [2, 4]
-        }
-      }
-    },
-  ];
-
   @override
   void initState() {
     super.initState();
     _getUserLocation();
     _startCompassListening();
+    _loadParkingSpots();
   }
 
   @override
@@ -378,6 +58,18 @@ class _ReservePageState extends State<ReservePage> {
     _compassSubscription?.cancel();
     _compassHandler.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadParkingSpots() async {
+    try {
+      List<Map<String, dynamic>> spots = await ApiService.getParkingSpots();
+      setState(() {
+        filteredParkingSpots = spots;
+      });
+    } catch (e) {
+      print("Error loading parking spots: $e");
+      // You might want to show an error message to the user
+    }
   }
 
   void _startCompassListening() {
@@ -435,8 +127,11 @@ class _ReservePageState extends State<ReservePage> {
     if (userLocation == null) return;
 
     setState(() {
-      filteredParkingSpots = parkingSpots.where((spot) {
-        double distance = _calculateDistance(userLocation!, spot["location"]);
+      filteredParkingSpots = filteredParkingSpots.where((spot) {
+        double distance = _calculateDistance(userLocation!, LatLng(
+            double.parse(spot['latitude'].toString()),
+            double.parse(spot['longitude'].toString())
+        ));
         return distance <= 5.0; // 5km radius
       }).toList();
     });
@@ -470,8 +165,11 @@ class _ReservePageState extends State<ReservePage> {
 
       if (userLocation != null) {
         _mapController.move(userLocation!, 14);
-      } else if (parkingSpots.isNotEmpty) {
-        _mapController.move(parkingSpots[0]["location"], 14);
+      } else if (filteredParkingSpots.isNotEmpty) {
+        _mapController.move(LatLng(
+            double.parse(filteredParkingSpots[0]['latitude'].toString()),
+            double.parse(filteredParkingSpots[0]['longitude'].toString())
+        ), 14);
       }
     } catch (e) {
       print("Error getting location: $e");
@@ -542,8 +240,11 @@ class _ReservePageState extends State<ReservePage> {
                     child: FlutterMap(
                       mapController: _mapController,
                       options: MapOptions(
-                        initialCenter: userLocation ?? (parkingSpots.isNotEmpty
-                            ? parkingSpots[0]["location"]
+                        initialCenter: userLocation ?? (filteredParkingSpots.isNotEmpty
+                            ? LatLng(
+                            double.parse(filteredParkingSpots[0]['latitude'].toString()),
+                            double.parse(filteredParkingSpots[0]['longitude'].toString())
+                        )
                             : const LatLng(14.2786, 121.4131)),
                         initialZoom: 16,
                       ),
@@ -578,10 +279,13 @@ class _ReservePageState extends State<ReservePage> {
 
                         MarkerLayer(
                           markers: [
-                            // Show all parking spots on the map, not just filtered ones
-                            ...parkingSpots.map((spot) {
+                            // Show all parking spots on the map
+                            ...filteredParkingSpots.map((spot) {
                               return Marker(
-                                point: spot["location"],
+                                point: LatLng(
+                                    double.parse(spot['latitude'].toString()),
+                                    double.parse(spot['longitude'].toString())
+                                ),
                                 width: 50,
                                 height: 50,
                                 child: Image.asset(
@@ -665,7 +369,7 @@ class _ReservePageState extends State<ReservePage> {
               ),
             ),
 
-            // ✅ List ng cards - using filteredParkingSpots instead of all parkingSpots
+            // ✅ List ng cards - using filteredParkingSpots
             filteredParkingSpots.isEmpty
                 ? Padding(
               padding: const EdgeInsets.all(16.0),
@@ -711,11 +415,14 @@ class _ReservePageState extends State<ReservePage> {
   Widget _buildParkingCard(Map<String, dynamic> spot, BuildContext context) {
     // Calculate distance from user
     double distance = userLocation != null
-        ? _calculateDistance(userLocation!, spot["location"])
+        ? _calculateDistance(userLocation!, LatLng(
+        double.parse(spot['latitude'].toString()),
+        double.parse(spot['longitude'].toString())
+    ))
         : 0.0;
 
     // Get the specific image for this parking spot
-    String imagePath = _getParkingImage(spot["id"]);
+    String imagePath = _getParkingImage(spot['id']);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 30,left: 16,right: 16),
@@ -763,7 +470,7 @@ class _ReservePageState extends State<ReservePage> {
                       border: Border.all(color: Color(0xFF3B060A), width: 0.8),
                     ),
                     child: Text(
-                      "${spot["availableSpaces"]} free spaces",
+                      "${spot["available_spaces"]} free spaces",
                       style: const TextStyle(
                         color: Color(0xFF3B060A),
                         fontWeight: FontWeight.bold,
@@ -826,7 +533,7 @@ class _ReservePageState extends State<ReservePage> {
                       // Show available vehicle types
                       Wrap(
                         spacing: 1,
-                        children: (spot["vehicleTypes"] as Map<String, dynamic>).entries.map((entry) {
+                        children: (spot["vehicle_types"] as Map<String, dynamic>).entries.map((entry) {
                           return Chip(
                             label: Text(
                               "${entry.key}: ${entry.value["available"]}",

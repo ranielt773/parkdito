@@ -1,17 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:parkditto/api/api_service.dart';
+import 'package:parkditto/login.dart';
 import 'profile/details.dart';
 import 'profile/password.dart';
-import 'profile/plan.dart';
+import 'profile/plan.dart'; // Import your API service
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  Map<String, dynamic>? userData;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final data = await ApiService.getUserData();
+    setState(() {
+      userData = data;
+      isLoading = false;
+    });
+  }
 
   // Function to handle navigation to Personal Details page
   void _navigateToPersonalDetails(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PersonalDetailsPage()),
-    );
+      MaterialPageRoute(builder: (context) => PersonalDetailsPage(userData: userData)),
+    ).then((_) {
+      // Reload user data when returning from details page
+      _loadUserData();
+    });
   }
 
   // Function to handle navigation to Change Password page
@@ -26,6 +53,37 @@ class ProfilePage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const MyPlanPage()),
+    );
+  }
+
+  // Function to handle logout
+  Future<void> _handleLogout() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Logout"),
+          content: const Text("Are you sure you want to logout?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context); // Close dialog
+                await ApiService.logout();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                      (route) => false,
+                );
+              },
+              child: const Text("Logout"),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -65,7 +123,9 @@ class ProfilePage extends StatelessWidget {
           ],
         ),
       ),
-      body: Column(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
         children: <Widget>[
           const SizedBox(height: 10),
           // Profile Picture with border
@@ -79,7 +139,18 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 10),
+          // Display username if available
+          if (userData != null && userData!['username'] != null)
+            Text(
+              userData!['username'],
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF3B060A),
+              ),
+            ),
+          const SizedBox(height: 20),
 
           // Options List
           Expanded(
@@ -110,7 +181,7 @@ class ProfilePage extends StatelessWidget {
                 // Sign Out Button
                 Center(
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: _handleLogout,
                     icon: const Icon(Icons.logout, color: Colors.white),
                     label: const Text(
                       "Sign out",
@@ -131,7 +202,6 @@ class ProfilePage extends StatelessWidget {
                         horizontal: 60,
                         vertical: 3,
                       ),
-
                     ),
                   ),
                 ),

@@ -1,7 +1,85 @@
 import 'package:flutter/material.dart';
+import 'api/api_service.dart';
 
-class SignupPage extends StatelessWidget {
+class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
+
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+
+  // Function to handle signup
+  void handleSignup() async {
+    final username = usernameController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Passwords do not match'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final response = await ApiService.register(username, email, password);
+
+      if (response['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message']),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate back to login
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,16 +111,13 @@ class SignupPage extends StatelessWidget {
             ),
           ),
 
-          // 🔹 Back button
-
-
-          // 🔹 Curved container for form (same as login)
+          // 🔹 Curved container for form
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.68, // Slightly taller for signup form
+              height: MediaQuery.of(context).size.height * 0.68,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
               decoration: BoxDecoration(
                 color: const Color(0xFFF9F3E6).withOpacity(0.97),
@@ -68,7 +143,7 @@ class SignupPage extends StatelessWidget {
                         // Center-aligned title
                         const Center(
                           child: Padding(
-                            padding: EdgeInsets.only(top: 15), // Adjust based on your needs
+                            padding: EdgeInsets.only(top: 15),
                             child: Text(
                               "Sign up",
                               style: TextStyle(
@@ -85,7 +160,7 @@ class SignupPage extends StatelessWidget {
                           top: 0,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Color(0xFF3B060A),
+                              color: const Color(0xFF3B060A),
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
@@ -107,8 +182,9 @@ class SignupPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 18),
 
-                    // 🔹 Usenrname
+                    // 🔹 Username
                     TextField(
+                      controller: usernameController,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF3B060A)),
                         labelText: "Username",
@@ -129,6 +205,8 @@ class SignupPage extends StatelessWidget {
 
                     // 🔹 Email
                     TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF3B060A)),
                         labelText: "Email Address",
@@ -149,6 +227,7 @@ class SignupPage extends StatelessWidget {
 
                     // 🔹 Password
                     TextField(
+                      controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF3B060A)),
@@ -171,6 +250,7 @@ class SignupPage extends StatelessWidget {
 
                     // 🔹 Confirm Password
                     TextField(
+                      controller: confirmPasswordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF3B060A)),
@@ -200,9 +280,9 @@ class SignupPage extends StatelessWidget {
                           width: 190,
                           height: 40,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: handleSignup, // Connect to the function
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF3B060A),
+                              backgroundColor: const Color(0xFF3B060A),
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
@@ -224,7 +304,7 @@ class SignupPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Divider(
-                            color: Color(0xFF3B060A).withOpacity(0.5),
+                            color: const Color(0xFF3B060A).withOpacity(0.5),
                             thickness: 1,
                           ),
                         ),
@@ -233,14 +313,14 @@ class SignupPage extends StatelessWidget {
                           child: Text(
                             "OR",
                             style: TextStyle(
-                              color: Color(0xFF3B060A).withOpacity(0.7),
+                              color: const Color(0xFF3B060A).withOpacity(0.7),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                         Expanded(
                           child: Divider(
-                            color: Color(0xFF3B060A).withOpacity(0.5),
+                            color: const Color(0xFF3B060A).withOpacity(0.5),
                             thickness: 1,
                           ),
                         ),
