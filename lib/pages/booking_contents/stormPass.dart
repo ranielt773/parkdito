@@ -148,18 +148,18 @@ class StormPassPage extends StatelessWidget {
               height: 55,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => const PaymentPage(
-                        planName: "Monthly",
-                        planPrice: "799/m",
-                        planColor: Color(0xFFFDF7D8),
-                        textColor: Colors.black,
-                      ),
-                    ),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder:
+                  //         (context) => const PaymentPage(
+                  //       planName: "Monthly",
+                  //       planPrice: "799/m",
+                  //       planColor: Color(0xFFFDF7D8),
+                  //       textColor: Colors.black,
+                  //     ),
+                  //   ),
+                  // );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF3B060A),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parkditto/api/api_service.dart';
 import 'confirmation.dart';
 
 class PaymentPage extends StatelessWidget {
@@ -6,6 +7,10 @@ class PaymentPage extends StatelessWidget {
   final String planPrice;
   final Color planColor;
   final Color textColor;
+  final Map<String, dynamic> parkingData;
+  final int selectedSlot;
+  final String selectedFloor;
+  final String selectedVehicle;
 
   const PaymentPage({
     super.key,
@@ -13,6 +18,10 @@ class PaymentPage extends StatelessWidget {
     required this.planPrice,
     required this.planColor,
     required this.textColor,
+    required this.parkingData,
+    required this.selectedSlot,
+    required this.selectedFloor,
+    required this.selectedVehicle,
   });
 
   @override
@@ -246,13 +255,59 @@ class PaymentPage extends StatelessWidget {
                       vertical: 12,
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ConfirmationPage(),
-                      ),
-                    );
+                  // payment.dart - Modify the Confirm button onPressed
+
+                  // payment.dart - Modify the Confirm button onPressed
+                  onPressed: () async {
+                    try {
+                      // Get user data
+                      final userData = await ApiService.getUserData();
+                      if (userData == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Please login first")),
+                        );
+                        return;
+                      }
+
+                      // Extract numeric price from planPrice
+                      String numericPrice = planPrice.replaceAll(RegExp(r'[^\d.]'), '');
+                      if (numericPrice.isEmpty) {
+                        numericPrice = "0";
+                      }
+
+                      // Create transaction
+                      final transactionResult = await ApiService.createBooking(
+                        parkingData["id"] ?? 1,
+                        userData['id'],
+                        "Slot $selectedSlot",
+                        "booking",
+                        DateTime.now(),
+                        double.parse(numericPrice),
+                        "Bank Transfer",
+                      );
+
+                      // Update parking availability - use the modified approach
+                      await ApiService.updateParkingAvailability(
+                        parkingData["id"] ?? 1,
+                        selectedVehicle,
+                        selectedFloor,
+                        selectedSlot,
+                        true, // Mark as occupied
+                      );
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ConfirmationPage(
+                            transactionData: transactionResult, // Make sure this is not null
+                          ),
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error: ${e.toString()}")),
+                      );
+                    }
                   },
                   child: const Text(
                     "Confirm",

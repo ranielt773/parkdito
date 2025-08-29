@@ -288,8 +288,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20)
                     .copyWith(top: 25, bottom: 50),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF9E5),
-                  borderRadius: BorderRadius.circular(20),
+                  color: const Color(0xFFFDF7D8).withOpacity(0.53),
                 ),
                 child: Column(
                   children: [

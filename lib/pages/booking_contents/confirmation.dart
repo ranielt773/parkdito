@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ConfirmationPage extends StatelessWidget {
-  const ConfirmationPage({super.key});
+  final Map<String, dynamic>? transactionData;
+
+  const ConfirmationPage({super.key, this.transactionData});
 
   @override
   Widget build(BuildContext context) {
+    // Handle null transactionData gracefully
+    String refNumber = transactionData?['ref_number']?.toString() ?? "7463164871236";
+    String amount = transactionData != null && transactionData!['amount'] != null
+        ? "₱${transactionData!['amount']}"
+        : "₱2500";
+
+    // Handle date parsing safely
+    String dateTime = "1:13 pm   14/08/2025"; // Default value
+    if (transactionData != null && transactionData!['arrival_time'] != null) {
+      try {
+        final arrivalTime = DateTime.parse(transactionData!['arrival_time']);
+        dateTime = "${DateFormat('h:mm a').format(arrivalTime)}   ${DateFormat('dd/MM/yyyy').format(arrivalTime)}";
+      } catch (e) {
+        // If parsing fails, keep the default value
+        dateTime = "1:13 pm   14/08/2025";
+      }
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       body: SafeArea(
@@ -86,9 +107,9 @@ class ConfirmationPage extends StatelessWidget {
                               fontWeight: FontWeight.bold, // Bold for Details
                             ),
                           ),
-                          const Text(
-                            "1:13 pm   14/08/2025",
-                            style: TextStyle(
+                          Text(
+                            dateTime, // Use the safely parsed dateTime
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF3B060A),
@@ -98,15 +119,15 @@ class ConfirmationPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    detailRow("Amount received", "₱2500"),
+                    detailRow("Amount received", amount), // Use the safe amount
                     detailRow("Plan duration", "Month"),
                     detailRow("Storm pass", "None"),
                     const SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text("Ref No.", style: TextStyle(fontSize: 15)),
-                        Text("7463164871236", style: TextStyle(fontSize: 15)),
+                      children: [
+                        const Text("Ref No.", style: TextStyle(fontSize: 15)),
+                        Text(refNumber, style: const TextStyle(fontSize: 15)), // Use the safe refNumber
                       ],
                     ),
                   ],

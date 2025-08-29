@@ -201,5 +201,90 @@ class ApiService {
       throw Exception('Network error: $e');
     }
   }
+// api_service.dart - Add these methods
 
+// Create booking transaction
+  static Future<Map<String, dynamic>> createBooking(
+      int parkingSpaceId,
+      int userId,
+      String lotNumber,
+      String transactionType,
+      DateTime arrivalTime,
+      double amount,
+      String paymentMethod, {
+        DateTime? departureTime,
+      }) async {
+    try {
+      final Map<String, dynamic> requestBody = {
+        'parking_space_id': parkingSpaceId,
+        'user_id': userId,
+        'lot_number': lotNumber,
+        'transaction_type': transactionType,
+        'arrival_time': arrivalTime.toIso8601String(),
+        'amount': amount,
+        'payment_method': paymentMethod,
+      };
+
+      if (departureTime != null) {
+        requestBody['departure_time'] = departureTime.toIso8601String();
+      }
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/create_transaction.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(requestBody),
+      ).timeout(const Duration(seconds: 10));
+
+      print('Create transaction response: ${response.statusCode}');
+      print('Create transaction body: ${response.body}');
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to create transaction. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error creating transaction: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+// Update parking space availability
+  static Future<Map<String, dynamic>> updateParkingAvailability(
+      int parkingSpaceId,
+      String vehicleType,
+      String floor,
+      int slotNumber,
+      bool isOccupied,
+      ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/update_parking_availability.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'parking_space_id': parkingSpaceId,
+          'vehicle_type': vehicleType,
+          'floor': floor,
+          'slot_number': slotNumber,
+          'is_occupied': isOccupied,
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      print('Update parking response: ${response.statusCode}');
+      print('Update parking body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to update parking. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error updating parking: $e');
+      throw Exception('Network error: $e');
+    }
+  }
 }

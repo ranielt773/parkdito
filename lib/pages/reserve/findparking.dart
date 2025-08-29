@@ -277,7 +277,12 @@ class _FindParkingPageState extends State<FindParkingPage> {
                       onPressed: selectedSlot != null ? () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ReservePlanPage()),
+                          MaterialPageRoute(builder: (context) => PlanPage(
+                            parkingData: widget.parkingData,
+                            selectedSlot: selectedSlot!, // Use null assertion operator
+                            selectedFloor: selectedFloor,
+                            selectedVehicle: selectedVehicle,
+                          )),
                         );
                       } : null,
                       style: ElevatedButton.styleFrom(
@@ -299,7 +304,12 @@ class _FindParkingPageState extends State<FindParkingPage> {
                       onPressed: selectedSlot != null ? () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => PlanPage()),
+                          MaterialPageRoute(builder: (context) => ReservePlanPage(
+                            parkingData: widget.parkingData,
+                            selectedSlot: selectedSlot!, // Use null assertion operator
+                            selectedFloor: selectedFloor,
+                            selectedVehicle: selectedVehicle,
+                          )),
                         );
                       } : null,
                       style: ElevatedButton.styleFrom(

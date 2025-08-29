@@ -411,7 +411,14 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => PlanPage()),
+                        MaterialPageRoute(
+                          builder: (context) => PlanPage(
+                            parkingData: {}, // You need to pass actual parking data here
+                            selectedSlot: 0, // You need to pass actual selected slot here
+                            selectedFloor: "", // You need to pass actual selected floor here
+                            selectedVehicle: "", // You need to pass actual selected vehicle here
+                          ),
+                        ),
                       );
                     },
                     child: const Text(
@@ -462,7 +469,12 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const PlanPage(),
+                              builder: (context) => PlanPage(
+                                parkingData: {}, // You need to pass actual parking data here
+                                selectedSlot: 0, // You need to pass actual selected slot here
+                                selectedFloor: "", // You need to pass actual selected floor here
+                                selectedVehicle: "", // You need to pass actual selected vehicle here
+                              ),
                             ),
                           );
                         },

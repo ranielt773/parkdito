@@ -3,8 +3,20 @@ import 'package:intl/intl.dart';
 import 'stormPass.dart';
 import 'payment.dart';
 
+
+
 class ReservePlanPage extends StatefulWidget {
-  const ReservePlanPage({super.key});
+  final Map<String, dynamic> parkingData;
+  final int selectedSlot;
+  final String selectedFloor;
+  final String selectedVehicle;
+  const ReservePlanPage({
+    super.key,
+    required this.parkingData,
+    required this.selectedSlot,
+    required this.selectedFloor,
+    required this.selectedVehicle,
+  });
 
   @override
   State<ReservePlanPage> createState() => _ReservePlanPageState();
@@ -64,13 +76,16 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => const PaymentPage(
-                            planName: "Weekly",
-                            planPrice: "750/wk",
-                            planColor: Color(0xFFFDF7D8),
-                            textColor: Colors.black,
-                          ),
+                      builder: (context) => PaymentPage(
+                        planName: "Yearly",
+                        planPrice: "30000/yr",
+                        planColor: Color(0xFF3B060A),
+                        textColor: Colors.white,
+                        parkingData: widget.parkingData, // Add this
+                        selectedSlot: widget.selectedSlot, // Add this
+                        selectedFloor: widget.selectedFloor, // Add this
+                        selectedVehicle: widget.selectedVehicle, // Add this
+                      ),
                     ),
                   );
                 },
@@ -107,13 +122,16 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => const PaymentPage(
-                            planName: "Monthly",
-                            planPrice: "2500/m",
-                            planColor: Color(0xFF3B060A),
-                            textColor: Colors.white,
-                          ),
+                      builder: (context) => PaymentPage(
+                        planName: "Yearly",
+                        planPrice: "30000/yr",
+                        planColor: Color(0xFF3B060A),
+                        textColor: Colors.white,
+                        parkingData: widget.parkingData, // Add this
+                        selectedSlot: widget.selectedSlot, // Add this
+                        selectedFloor: widget.selectedFloor, // Add this
+                        selectedVehicle: widget.selectedVehicle, // Add this
+                      ),
                     ),
                   );
                 },
@@ -156,13 +174,16 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => const PaymentPage(
-                            planName: "Yearly",
-                            planPrice: "30000/yr",
-                            planColor: Color(0xFF3B060A),
-                            textColor: Colors.white,
-                          ),
+                      builder: (context) => PaymentPage(
+                        planName: "Yearly",
+                        planPrice: "30000/yr",
+                        planColor: Color(0xFF3B060A),
+                        textColor: Colors.white,
+                        parkingData: widget.parkingData, // Add this
+                        selectedSlot: widget.selectedSlot, // Add this
+                        selectedFloor: widget.selectedFloor, // Add this
+                        selectedVehicle: widget.selectedVehicle, // Add this
+                      ),
                     ),
                   );
                 },

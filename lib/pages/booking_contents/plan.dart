@@ -2,8 +2,20 @@ import 'package:flutter/material.dart';
 import 'stormPass.dart';
 import 'payment.dart';
 
+
+
 class PlanPage extends StatelessWidget {
-  const PlanPage({super.key});
+  final Map<String, dynamic> parkingData;
+  final int selectedSlot;
+  final String selectedFloor;
+  final String selectedVehicle;
+  const PlanPage({
+    super.key,
+    required this.parkingData,
+    required this.selectedSlot,
+    required this.selectedFloor,
+    required this.selectedVehicle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +66,15 @@ class PlanPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => const PaymentPage(
-                        planName: "Weekly",
-                        planPrice: "750/wk",
-                        planColor: Color(0xFFFDF7D8),
-                        textColor: Colors.black,
+                      builder: (context) => PaymentPage(
+                        planName: "Monthly",
+                        planPrice: "2500/m",
+                        planColor: Color(0xFF3B060A),
+                        textColor: Colors.white,
+                        parkingData: parkingData,
+                        selectedSlot: selectedSlot,
+                        selectedFloor: selectedFloor,
+                        selectedVehicle: selectedVehicle,
                       ),
                     ),
                   );
@@ -97,12 +112,15 @@ class PlanPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => const PaymentPage(
-                        planName: "Monthly",
-                        planPrice: "2500/m",
-                        planColor: Color(0xFF3B060A),
-                        textColor: Colors.white,
+                      builder: (context) => PaymentPage(
+                        planName: "Monthly", // Changed from Monthly to Weekly
+                        planPrice: "1000/m", // Changed from 2500/m to 750/wk
+                        planColor: Color(0xFFFDF7D8), // Changed color
+                        textColor: Colors.black, // Changed text color
+                        parkingData: parkingData,
+                        selectedSlot: selectedSlot,
+                        selectedFloor: selectedFloor,
+                        selectedVehicle: selectedVehicle,
                       ),
                     ),
                   );
@@ -146,12 +164,15 @@ class PlanPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => const PaymentPage(
-                        planName: "Yearly",
-                        planPrice: "30000/yr",
-                        planColor: Color(0xFF3B060A),
-                        textColor: Colors.white,
+                      builder: (context) => PaymentPage(
+                        planName: "Yearly", // Changed from Monthly to Weekly
+                        planPrice: "5499/y", // Changed from 2500/m to 750/wk
+                        planColor: Color(0xFFFDF7D8), // Changed color
+                        textColor: Colors.black, // Changed text color
+                        parkingData: parkingData,
+                        selectedSlot: selectedSlot,
+                        selectedFloor: selectedFloor,
+                        selectedVehicle: selectedVehicle,
                       ),
                     ),
                   );
