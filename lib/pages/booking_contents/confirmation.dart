@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:parkditto/mainpage.dart';
 
 class ConfirmationPage extends StatelessWidget {
   final Map<String, dynamic>? transactionData;
@@ -38,13 +39,8 @@ class ConfirmationPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: Image.asset(
-                      "assets/back.png",
-                      width: 40,
-                      height: 40,
-                    ),
+                  const SizedBox(
+                    width: 40, // keeps balance with back button width
                   ),
                   Column(
                     children: [
@@ -196,7 +192,13 @@ class ConfirmationPage extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          // TODO: Done logic
+                          // Navigate to main page (which includes the bottom navigation)
+                          // and clear the navigation stack
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => MainPage()),
+                                (Route<dynamic> route) => false,
+                          );
                         },
                         child: const Text(
                           "Done",

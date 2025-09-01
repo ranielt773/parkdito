@@ -22,7 +22,8 @@ class _ReservePageState extends State<ReservePage> {
   LatLng? userLocation;
   double? userHeading;
   final MapController _mapController = MapController();
-  List<Map<String, dynamic>> filteredParkingSpots = [];
+  List<Map<String, dynamic>> allParkingSpots = []; // All parking spots
+  List<Map<String, dynamic>> filteredParkingSpots = []; // Filtered (nearby) spots
   CompassHandler _compassHandler = CompassHandler();
   StreamSubscription<double>? _compassSubscription;
 
@@ -64,7 +65,8 @@ class _ReservePageState extends State<ReservePage> {
     try {
       List<Map<String, dynamic>> spots = await ApiService.getParkingSpots();
       setState(() {
-        filteredParkingSpots = spots;
+        allParkingSpots = spots;
+        filteredParkingSpots = spots; // Initially show all spots
       });
     } catch (e) {
       print("Error loading parking spots: $e");
@@ -127,7 +129,7 @@ class _ReservePageState extends State<ReservePage> {
     if (userLocation == null) return;
 
     setState(() {
-      filteredParkingSpots = filteredParkingSpots.where((spot) {
+      filteredParkingSpots = allParkingSpots.where((spot) {
         double distance = _calculateDistance(userLocation!, LatLng(
             double.parse(spot['latitude'].toString()),
             double.parse(spot['longitude'].toString())
@@ -165,10 +167,10 @@ class _ReservePageState extends State<ReservePage> {
 
       if (userLocation != null) {
         _mapController.move(userLocation!, 14);
-      } else if (filteredParkingSpots.isNotEmpty) {
+      } else if (allParkingSpots.isNotEmpty) {
         _mapController.move(LatLng(
-            double.parse(filteredParkingSpots[0]['latitude'].toString()),
-            double.parse(filteredParkingSpots[0]['longitude'].toString())
+            double.parse(allParkingSpots[0]['latitude'].toString()),
+            double.parse(allParkingSpots[0]['longitude'].toString())
         ), 14);
       }
     } catch (e) {
@@ -240,10 +242,10 @@ class _ReservePageState extends State<ReservePage> {
                     child: FlutterMap(
                       mapController: _mapController,
                       options: MapOptions(
-                        initialCenter: userLocation ?? (filteredParkingSpots.isNotEmpty
+                        initialCenter: userLocation ?? (allParkingSpots.isNotEmpty
                             ? LatLng(
-                            double.parse(filteredParkingSpots[0]['latitude'].toString()),
-                            double.parse(filteredParkingSpots[0]['longitude'].toString())
+                            double.parse(allParkingSpots[0]['latitude'].toString()),
+                            double.parse(allParkingSpots[0]['longitude'].toString())
                         )
                             : const LatLng(14.2786, 121.4131)),
                         initialZoom: 16,
@@ -272,15 +274,26 @@ class _ReservePageState extends State<ReservePage> {
                                 borderColor: Colors.blue,
                                 borderStrokeWidth: 2,
                                 useRadiusInMeter: true,
-                                radius: 2000, // 5km radius in meters
+                                radius: 5000, // 5km radius in meters
                               ),
                             ],
                           ),
 
                         MarkerLayer(
                           markers: [
-                            // Show all parking spots on the map
-                            ...filteredParkingSpots.map((spot) {
+                            // Show ALL parking spots on the map (not just filtered ones)
+                            ...allParkingSpots.map((spot) {
+                              // Calculate distance for each spot
+                              double distance = userLocation != null
+                                  ? _calculateDistance(userLocation!, LatLng(
+                                  double.parse(spot['latitude'].toString()),
+                                  double.parse(spot['longitude'].toString())
+                              ))
+                                  : double.infinity;
+
+                              // Use different marker for spots within 5km
+                              bool isNearby = distance <= 5.0;
+
                               return Marker(
                                 point: LatLng(
                                     double.parse(spot['latitude'].toString()),
@@ -289,9 +302,10 @@ class _ReservePageState extends State<ReservePage> {
                                 width: 50,
                                 height: 50,
                                 child: Image.asset(
-                                  "assets/logoo.png",
+                                  isNearby ? "assets/logoo.png" : "assets/logoo.png", // Use different icon for far spots
                                   width: 42,
                                   height: 42,
+                                  color: isNearby ? null : Colors.grey, // Gray out far spots
                                 ),
                               );
                             }).toList(),
@@ -354,6 +368,35 @@ class _ReservePageState extends State<ReservePage> {
                       ),
                     ),
                   ),
+
+                // ✅ Location button positioned on top of the map
+                Positioned(
+                  bottom: 13,
+                  right: 24,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.my_location, color: Color(0xFF3B060A)),
+                      onPressed: () {
+                        if (userLocation != null) {
+                          _mapController.move(userLocation!, _mapController.camera.zoom);
+                        } else {
+                          _getUserLocation();
+                        }
+                      },
+                    ),
+                  ),
+                ),
               ],
             ),
 
@@ -369,7 +412,7 @@ class _ReservePageState extends State<ReservePage> {
               ),
             ),
 
-            // ✅ List ng cards - using filteredParkingSpots
+            // ✅ List ng cards - using FILTERED parking spots (only nearby ones)
             filteredParkingSpots.isEmpty
                 ? Padding(
               padding: const EdgeInsets.all(16.0),
@@ -398,17 +441,6 @@ class _ReservePageState extends State<ReservePage> {
           ],
         ),
       ),
-
-      // Floating action button to re-center the map
-      floatingActionButton: userLocation != null
-          ? FloatingActionButton(
-        onPressed: () {
-          _mapController.move(userLocation!, _mapController.camera.zoom);
-        },
-        backgroundColor: Color(0xFF3B060A),
-        child: Icon(Icons.my_location, color: Colors.white),
-      )
-          : null,
     );
   }
 

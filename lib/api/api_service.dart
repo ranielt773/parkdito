@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.68.74/parkditto_api"; // Use 10.0.2.2 for Android emulator
+  static const String baseUrl = "http://192.168.68.69/parkditto_api"; // Use 10.0.2.2 for Android emulator
   // For physical device testing: Use your computer's IP address instead of localhost
 
   static Future<Map<String, dynamic>> login(String username, String password) async {
@@ -284,6 +284,62 @@ class ApiService {
       }
     } catch (e) {
       print('Error updating parking: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  // Add these methods to your ApiService class
+  static Future<Map<String, dynamic>> createBookingWithDuration(
+      int parkingSpaceId,
+      int userId,
+      String lotNumber,
+      String transactionType,
+      DateTime arrivalTime,
+      double amount,
+      String paymentMethod,
+      String durationType,
+      int durationValue,
+      ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/create_transaction.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'parking_space_id': parkingSpaceId,
+          'user_id': userId,
+          'lot_number': lotNumber,
+          'transaction_type': transactionType,
+          'arrival_time': arrivalTime.toIso8601String(),
+          'amount': amount,
+          'payment_method': paymentMethod,
+          'duration_type': durationType,
+          'duration_value': durationValue,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to create booking');
+      }
+    } catch (e) {
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getActiveReservations(int parkingSpaceId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/get_active_reservations.php?parking_space_id=$parkingSpaceId'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return List<Map<String, dynamic>>.from(data['data']);
+      } else {
+        throw Exception('Failed to get active reservations');
+      }
+    } catch (e) {
       throw Exception('Network error: $e');
     }
   }

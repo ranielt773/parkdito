@@ -77,8 +77,8 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => PaymentPage(
-                        planName: "Yearly",
-                        planPrice: "30000/yr",
+                        planName: "Weekly",
+                        planPrice: "599/w",
                         planColor: Color(0xFF3B060A),
                         textColor: Colors.white,
                         parkingData: widget.parkingData, // Add this
@@ -123,8 +123,8 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => PaymentPage(
-                        planName: "Yearly",
-                        planPrice: "30000/yr",
+                        planName: "Monthly",
+                        planPrice: "1299/m",
                         planColor: Color(0xFF3B060A),
                         textColor: Colors.white,
                         parkingData: widget.parkingData, // Add this

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parkditto/api/api_service.dart';
 import 'package:parkditto/pages/booking_contents/plan.dart';
 import 'package:parkditto/pages/booking_contents/reservePlan.dart';
 
@@ -113,6 +114,27 @@ class _FindParkingPageState extends State<FindParkingPage> {
     }
     return ["Car", "Mini Truck", "Motorcycle"];
   }
+  Future<List<int>> _getOccupiedSlotsFromReservations() async {
+    try {
+      final reservations = await ApiService.getActiveReservations(widget.parkingData["id"]);
+
+      // Extract slot numbers from reservations
+      List<int> occupiedSlots = [];
+      for (var reservation in reservations) {
+        // Extract slot number from lot_number (e.g., "Slot 5" -> 5)
+        final lotNumber = reservation['lot_number'];
+        final match = RegExp(r'Slot (\d+)').firstMatch(lotNumber);
+        if (match != null) {
+          occupiedSlots.add(int.parse(match.group(1)!));
+        }
+      }
+
+      return occupiedSlots;
+    } catch (e) {
+      print('Error getting reservations: $e');
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,206 +155,231 @@ class _FindParkingPageState extends State<FindParkingPage> {
         });
       });
     }
+    return FutureBuilder<List<int>>(
+        future: _getOccupiedSlotsFromReservations(),
+        builder: (context, snapshot) {
+          final reservationOccupiedSlots = snapshot.data ?? [];
+          final allOccupiedSlots = [
+            ...currentOccupiedSlots,
+            ...reservationOccupiedSlots
+          ];
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: Image.asset(
-                      "assets/back.png",
-                      width: 40,
-                      height: 40,
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      const Text(
-                        "Reserve slot",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF3B060A),
-                        ),
-                      ),
-                      Text(
-                        widget.parkingData["name"],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  InkWell(
-                    onTap: () {},
-                    child: Image.asset(
-                      "assets/notif.png",
-                      width: 40,
-                      height: 40,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Parking info
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInfoItem("Total Spaces", widget.parkingData["total_spaces"].toString()),
-                    _buildInfoItem("Available", widget.parkingData["available_spaces"].toString()),
-                    _buildInfoItem("Distance", "2.5 km"),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Tabs - Show only available floors for current vehicle
-              if (currentFloors.length > 1) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: currentFloors.map((floor) {
-                    return _buildTab(floor, selectedFloor == floor);
-                  }).toList(),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              // Parking slot layout
-              _buildParkingSlots(currentOccupiedSlots, slotHeight, rows, cols, vehicleImage),
-
-              const SizedBox(height: 20),
-
-              // Vehicle type selector
-              const Text(
-                "Vehicle type",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF3B060A)),
-              ),
-              const SizedBox(height: 10),
-              Center(
-                child: Wrap(
-                  spacing: 3,
-                  alignment: WrapAlignment.center,
-                  children: getAvailableVehicleTypes().map((type) {
-                    bool selected = selectedVehicle == type;
-                    return Container(
-                      width: 105,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            selectedVehicle = type;
-                            selectedSlot = null;
-                            // Reset to first available floor for this vehicle type
-                            selectedFloor = getVehicleConfig(type)["floors"][0];
-                          });
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: selected ? const Color(0xFF3B060A) : Color(0xFF3B060A2E).withOpacity(0.18),
-                            borderRadius: BorderRadius.circular(4),
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Image.asset(
+                            "assets/back.png",
+                            width: 40,
+                            height: 40,
                           ),
-                          child: Text(
-                            type,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: selected ? Color(0xFFFDF7D8) : Color(0xFF3B060A).withOpacity(0.41),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                        ),
+                        Column(
+                          children: [
+                            const Text(
+                              "Reserve slot",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF3B060A),
+                              ),
+                            ),
+                            Text(
+                              widget.parkingData["name"],
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        InkWell(
+                          onTap: () {},
+                          child: Image.asset(
+                            "assets/notif.png",
+                            width: 40,
+                            height: 40,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Parking info
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildInfoItem("Total Spaces", widget
+                              .parkingData["total_spaces"].toString()),
+                          _buildInfoItem("Available", widget
+                              .parkingData["available_spaces"].toString()),
+                          _buildInfoItem("Distance", "2.5 km"),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Tabs - Show only available floors for current vehicle
+                    if (currentFloors.length > 1) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: currentFloors.map((floor) {
+                          return _buildTab(floor, selectedFloor == floor);
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+
+                    // Parking slot layout
+                    _buildParkingSlots(
+                        currentOccupiedSlots, slotHeight, rows, cols,
+                        vehicleImage),
+
+                    const SizedBox(height: 20),
+
+                    // Vehicle type selector
+                    const Text(
+                      "Vehicle type",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF3B060A)),
+                    ),
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Wrap(
+                        spacing: 3,
+                        alignment: WrapAlignment.center,
+                        children: getAvailableVehicleTypes().map((type) {
+                          bool selected = selectedVehicle == type;
+                          return Container(
+                            width: 105,
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  selectedVehicle = type;
+                                  selectedSlot = null;
+                                  // Reset to first available floor for this vehicle type
+                                  selectedFloor =
+                                  getVehicleConfig(type)["floors"][0];
+                                });
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: selected
+                                      ? const Color(0xFF3B060A)
+                                      : Color(0xFF3B060A2E).withOpacity(0.18),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  type,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: selected ? Color(0xFFFDF7D8) : Color(
+                                        0xFF3B060A).withOpacity(0.41),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 70),
+
+                    // Action buttons
+                    Row(
+                      children: [
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: selectedSlot != null ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) =>
+                                    PlanPage(
+                                      parkingData: widget.parkingData,
+                                      selectedSlot: selectedSlot!,
+                                      // Use null assertion operator
+                                      selectedFloor: selectedFloor,
+                                      selectedVehicle: selectedVehicle,
+                                    )),
+                              );
+                            } : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: selectedSlot != null ? Color(
+                                  0xFF02542D) : Colors.grey,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                            child: const Text(
+                              "Reserve",
+                              style: TextStyle(color: Color(0xFFFDF7D8)),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: selectedSlot != null ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) =>
+                                    ReservePlanPage(
+                                      parkingData: widget.parkingData,
+                                      selectedSlot: selectedSlot!,
+                                      // Use null assertion operator
+                                      selectedFloor: selectedFloor,
+                                      selectedVehicle: selectedVehicle,
+                                    )),
+                              );
+                            } : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: selectedSlot != null ? Color(
+                                  0xFF3B060A) : Colors.grey,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              "Book now",
+                              style: TextStyle(color: Color(0xFFFDF7D8)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                      ],
+                    )
+                  ],
                 ),
               ),
-              const SizedBox(height: 70),
-
-              // Action buttons
-              Row(
-                children: [
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: selectedSlot != null ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => PlanPage(
-                            parkingData: widget.parkingData,
-                            selectedSlot: selectedSlot!, // Use null assertion operator
-                            selectedFloor: selectedFloor,
-                            selectedVehicle: selectedVehicle,
-                          )),
-                        );
-                      } : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: selectedSlot != null ? Color(0xFF02542D) : Colors.grey,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      child: const Text(
-                        "Reserve",
-                        style: TextStyle(color: Color(0xFFFDF7D8)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: selectedSlot != null ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ReservePlanPage(
-                            parkingData: widget.parkingData,
-                            selectedSlot: selectedSlot!, // Use null assertion operator
-                            selectedFloor: selectedFloor,
-                            selectedVehicle: selectedVehicle,
-                          )),
-                        );
-                      } : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: selectedSlot != null ? Color(0xFF3B060A) : Colors.grey,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        "Book now",
-                        style: TextStyle(color: Color(0xFFFDF7D8)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        },
+          );
   }
 
   Widget _buildInfoItem(String title, String value) {

@@ -258,9 +258,9 @@ class PaymentPage extends StatelessWidget {
                   // payment.dart - Modify the Confirm button onPressed
 
                   // payment.dart - Modify the Confirm button onPressed
+                  // Modify the onPressed method in payment.dart
                   onPressed: () async {
                     try {
-                      // Get user data
                       final userData = await ApiService.getUserData();
                       if (userData == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -269,37 +269,49 @@ class PaymentPage extends StatelessWidget {
                         return;
                       }
 
-                      // Extract numeric price from planPrice
                       String numericPrice = planPrice.replaceAll(RegExp(r'[^\d.]'), '');
-                      if (numericPrice.isEmpty) {
-                        numericPrice = "0";
+                      if (numericPrice.isEmpty) numericPrice = "0";
+
+                      // Determine duration type and value based on plan
+                      String durationType = 'monthly';
+                      int durationValue = 1;
+
+                      if (planName.toLowerCase().contains('weekly')) {
+                        durationType = 'weekly';
+                        durationValue = 1;
+                      } else if (planName.toLowerCase().contains('monthly')) {
+                        durationType = 'monthly';
+                        durationValue = 1;
+                      } else if (planName.toLowerCase().contains('yearly')) {
+                        durationType = 'yearly';
+                        durationValue = 1;
                       }
 
-                      // Create transaction
-                      final transactionResult = await ApiService.createBooking(
+                      final transactionResult = await ApiService.createBookingWithDuration(
                         parkingData["id"] ?? 1,
                         userData['id'],
                         "Slot $selectedSlot",
-                        "booking",
+                        "reservation",
                         DateTime.now(),
                         double.parse(numericPrice),
                         "Bank Transfer",
+                        durationType,
+                        durationValue,
                       );
 
-                      // Update parking availability - use the modified approach
                       await ApiService.updateParkingAvailability(
                         parkingData["id"] ?? 1,
                         selectedVehicle,
                         selectedFloor,
                         selectedSlot,
-                        true, // Mark as occupied
+                        true,
                       );
 
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => ConfirmationPage(
-                            transactionData: transactionResult, // Make sure this is not null
+                            transactionData: transactionResult,
                           ),
                         ),
                       );
