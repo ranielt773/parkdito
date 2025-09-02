@@ -135,6 +135,28 @@ class _FindParkingPageState extends State<FindParkingPage> {
       return [];
     }
   }
+  Future<void> _refreshParkingData() async {
+    try {
+      final spots = await ApiService.getParkingSpots();
+      // Find the current parking spot in the updated data
+      final updatedSpot = spots.firstWhere(
+            (spot) => spot['id'] == widget.parkingData['id'],
+        orElse: () => widget.parkingData,
+      );
+
+      setState(() {
+        // Update the parking data with the latest information
+        // This will trigger a rebuild with the latest occupied slots
+      });
+    } catch (e) {
+      print('Error refreshing parking data: $e');
+    }
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refreshParkingData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +339,7 @@ class _FindParkingPageState extends State<FindParkingPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) =>
-                                    PlanPage(
+                                    ReservePlanPage(
                                       parkingData: widget.parkingData,
                                       selectedSlot: selectedSlot!,
                                       // Use null assertion operator
@@ -347,7 +369,7 @@ class _FindParkingPageState extends State<FindParkingPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) =>
-                                    ReservePlanPage(
+                                    PlanPage(
                                       parkingData: widget.parkingData,
                                       selectedSlot: selectedSlot!,
                                       // Use null assertion operator

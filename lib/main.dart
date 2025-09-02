@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'OpeningScreen.dart';
@@ -5,10 +7,26 @@ import 'login.dart';
 import 'mainpage.dart';
 import 'api/api_service.dart';
 
-void main() {
+void main() async {
+  await checkExpiredReservations();
   runApp(const ParkDittoApp());
 }
+Future<void> checkExpiredReservations() async {
+  try {
+    final response = await http.get(
+      Uri.parse('${ApiService.baseUrl}/check_expired_reservations.php'),
+    ).timeout(const Duration(seconds: 10));
 
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      print('Expired reservations processed: ${result['count']}');
+
+      // You might want to refresh the parking data after processing expired reservations
+    }
+  } catch (e) {
+    print('Error checking expired reservations: $e');
+  }
+}
 class ParkDittoApp extends StatelessWidget {
   const ParkDittoApp({super.key});
 

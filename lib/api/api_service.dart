@@ -211,43 +211,34 @@ class ApiService {
       String transactionType,
       DateTime arrivalTime,
       double amount,
-      String paymentMethod, {
-        DateTime? departureTime,
-      }) async {
+      String paymentMethod,
+      String vehicleType, // Add this parameter
+      String floor, // Add this parameter
+      ) async {
     try {
-      final Map<String, dynamic> requestBody = {
-        'parking_space_id': parkingSpaceId,
-        'user_id': userId,
-        'lot_number': lotNumber,
-        'transaction_type': transactionType,
-        'arrival_time': arrivalTime.toIso8601String(),
-        'amount': amount,
-        'payment_method': paymentMethod,
-      };
-
-      if (departureTime != null) {
-        requestBody['departure_time'] = departureTime.toIso8601String();
-      }
-
       final response = await http.post(
         Uri.parse('$baseUrl/create_transaction.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(requestBody),
-      ).timeout(const Duration(seconds: 10));
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'parking_space_id': parkingSpaceId,
+          'user_id': userId,
+          'lot_number': lotNumber,
+          'transaction_type': transactionType,
+          'arrival_time': arrivalTime.toIso8601String(),
+          'amount': amount,
+          'payment_method': paymentMethod,
+          'vehicle_type': vehicleType, // Add this
+          'floor': floor, // Add this
+        }),
+      );
 
-      print('Create transaction response: ${response.statusCode}');
-      print('Create transaction body: ${response.body}');
-
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
-        throw Exception('Failed to create transaction. Status code: ${response.statusCode}');
+        throw Exception('Failed to create booking: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error creating transaction: $e');
-      throw Exception('Network error: $e');
+      throw Exception('Failed to create booking: $e');
     }
   }
 
@@ -340,6 +331,28 @@ class ApiService {
         throw Exception('Failed to get active reservations');
       }
     } catch (e) {
+      throw Exception('Network error: $e');
+    }
+  }
+  static Future<Map<String, dynamic>> checkExpiredReservations() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/check_expired_reservations.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      print('Check expired response: ${response.statusCode}');
+      print('Check expired body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to check expired reservations. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error checking expired reservations: $e');
       throw Exception('Network error: $e');
     }
   }
