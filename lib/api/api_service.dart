@@ -3,10 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.68.69/parkditto_api"; // Use 10.0.2.2 for Android emulator
+  static const String baseUrl = "http://192.168.68.73/parkditto_api"; // Use 10.0.2.2 for Android emulator
   // For physical device testing: Use your computer's IP address instead of localhost
 
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(String username,
+      String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/login.php'),
@@ -34,7 +35,8 @@ class ApiService {
   }
 
   // api_service.dart - Update the register method
-  static Future<Map<String, dynamic>> register(String username, String email, String password) async {
+  static Future<Map<String, dynamic>> register(String username, String email,
+      String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/register.php'),
@@ -59,7 +61,8 @@ class ApiService {
           final errorResponse = jsonDecode(response.body);
           throw Exception(errorResponse['message'] ?? 'Failed to register');
         } catch (e) {
-          throw Exception('Failed to register. Status code: ${response.statusCode}');
+          throw Exception(
+              'Failed to register. Status code: ${response.statusCode}');
         }
       }
     } catch (e) {
@@ -97,6 +100,7 @@ class ApiService {
     await prefs.remove('userData');
     await prefs.setBool('isLoggedIn', false);
   }
+
   static Future<List<Map<String, dynamic>>> getParkingSpots() async {
     try {
       final response = await http.get(
@@ -117,7 +121,8 @@ class ApiService {
           throw Exception('Failed to get parking spots');
         }
       } else {
-        throw Exception('Failed to get parking spots. Status code: ${response.statusCode}');
+        throw Exception(
+            'Failed to get parking spots. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error getting parking spots: $e');
@@ -126,16 +131,14 @@ class ApiService {
   }
 
   // Create transaction
-  static Future<Map<String, dynamic>> createTransaction(
-      int parkingSpaceId,
+  static Future<Map<String, dynamic>> createTransaction(int parkingSpaceId,
       int userId,
       String lotNumber,
       String transactionType,
       String arrivalTime,
       double amount,
       String paymentMethod,
-      {String? departureTime}
-      ) async {
+      {String? departureTime}) async {
     try {
       final Map<String, dynamic> requestBody = {
         'parking_space_id': parkingSpaceId,
@@ -165,7 +168,8 @@ class ApiService {
       if (response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
-        throw Exception('Failed to create transaction. Status code: ${response.statusCode}');
+        throw Exception('Failed to create transaction. Status code: ${response
+            .statusCode}');
       }
     } catch (e) {
       print('Error creating transaction: $e');
@@ -174,7 +178,8 @@ class ApiService {
   }
 
   // Get user transactions
-  static Future<List<Map<String, dynamic>>> getUserTransactions(int userId) async {
+  static Future<List<Map<String, dynamic>>> getUserTransactions(
+      int userId) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/get_transactions.php?user_id=$userId'),
@@ -194,18 +199,19 @@ class ApiService {
           throw Exception('Failed to get transactions');
         }
       } else {
-        throw Exception('Failed to get transactions. Status code: ${response.statusCode}');
+        throw Exception(
+            'Failed to get transactions. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error getting transactions: $e');
       throw Exception('Network error: $e');
     }
   }
+
 // api_service.dart - Add these methods
 
 // Create booking transaction
-  static Future<Map<String, dynamic>> createBooking(
-      int parkingSpaceId,
+  static Future<Map<String, dynamic>> createBooking(int parkingSpaceId,
       int userId,
       String lotNumber,
       String transactionType,
@@ -248,8 +254,7 @@ class ApiService {
       String vehicleType,
       String floor,
       int slotNumber,
-      bool isOccupied,
-      ) async {
+      bool isOccupied,) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/update_parking_availability.php'),
@@ -271,7 +276,8 @@ class ApiService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        throw Exception('Failed to update parking. Status code: ${response.statusCode}');
+        throw Exception(
+            'Failed to update parking. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error updating parking: $e');
@@ -280,48 +286,14 @@ class ApiService {
   }
 
   // Add these methods to your ApiService class
-  static Future<Map<String, dynamic>> createBookingWithDuration(
-      int parkingSpaceId,
-      int userId,
-      String lotNumber,
-      String transactionType,
-      DateTime arrivalTime,
-      double amount,
-      String paymentMethod,
-      String durationType,
-      int durationValue,
-      ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/create_transaction.php'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'parking_space_id': parkingSpaceId,
-          'user_id': userId,
-          'lot_number': lotNumber,
-          'transaction_type': transactionType,
-          'arrival_time': arrivalTime.toIso8601String(),
-          'amount': amount,
-          'payment_method': paymentMethod,
-          'duration_type': durationType,
-          'duration_value': durationValue,
-        }),
-      );
 
-      if (response.statusCode == 201) {
-        return json.decode(response.body);
-      } else {
-        throw Exception('Failed to create booking');
-      }
-    } catch (e) {
-      throw Exception('Network error: $e');
-    }
-  }
 
-  static Future<List<Map<String, dynamic>>> getActiveReservations(int parkingSpaceId) async {
+  static Future<List<Map<String, dynamic>>> getActiveReservations(
+      int parkingSpaceId) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/get_active_reservations.php?parking_space_id=$parkingSpaceId'),
+        Uri.parse(
+            '$baseUrl/get_active_reservations.php?parking_space_id=$parkingSpaceId'),
       );
 
       if (response.statusCode == 200) {
@@ -334,6 +306,7 @@ class ApiService {
       throw Exception('Network error: $e');
     }
   }
+
   static Future<Map<String, dynamic>> checkExpiredReservations() async {
     try {
       final response = await http.get(
@@ -349,11 +322,124 @@ class ApiService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        throw Exception('Failed to check expired reservations. Status code: ${response.statusCode}');
+        throw Exception(
+            'Failed to check expired reservations. Status code: ${response
+                .statusCode}');
       }
     } catch (e) {
       print('Error checking expired reservations: $e');
       throw Exception('Network error: $e');
+    }
+  }
+
+// Get bookings with status filter
+  static Future<List<Map<String, dynamic>>> getBookingsByStatus(int userId,
+      String status) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '$baseUrl/get_bookings_by_status.php?user_id=$userId&status=$status'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      print('Bookings by status response: ${response.statusCode}');
+      print('Bookings by status body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        if (result['success']) {
+          return List<Map<String, dynamic>>.from(result['data']);
+        } else {
+          throw Exception('Failed to get bookings by status');
+        }
+      } else {
+        throw Exception(
+            'Failed to get bookings by status. Status code: ${response
+                .statusCode}');
+      }
+    } catch (e) {
+      print('Error getting bookings by status: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getUserBookings(int userId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/bookings.php?user_id=$userId'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      print('User bookings response: ${response.statusCode}');
+      print('User bookings body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // Check if response body is empty
+        if (response.body.isEmpty) {
+          print('Empty response body from server');
+          return [];
+        }
+
+        final decoded = jsonDecode(response.body);
+
+        if (decoded is List) {
+          return List<Map<String, dynamic>>.from(decoded);
+        } else if (decoded is Map<String, dynamic>) {
+          if (decoded.containsKey('error')) {
+            print('API Error: ${decoded['error']}');
+            return [];
+          }
+        }
+
+        return [];
+      } else {
+        print('Failed to get user bookings. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error getting user bookings: $e');
+      return [];
+    }
+  }
+  static Future<Map<String, dynamic>> createBookingWithDuration(
+      int parkingSpaceId,
+      int userId,
+      String lotNumber,
+      String transactionType,
+      String arrivalTime, // This can be empty for bookings
+      double amount,
+      String paymentMethod,
+      String durationType,
+      int durationValue, {
+        String? vehicleType,
+        String? floor,
+      }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/create_transaction.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'parking_space_id': parkingSpaceId,
+        'user_id': userId,
+        'lot_number': lotNumber,
+        'transaction_type': transactionType,
+        'arrival_time': arrivalTime, // This will be empty for bookings
+        'amount': amount,
+        'payment_method': paymentMethod,
+        'duration_type': durationType,
+        'duration_value': durationValue,
+        'vehicle_type': vehicleType,
+        'floor': floor,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to create booking');
     }
   }
 }

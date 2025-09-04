@@ -11,7 +11,7 @@ class MyPlanPage extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(10),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Back button + Title
               Row(
@@ -90,7 +90,7 @@ class MyPlanPage extends StatelessWidget {
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 60,
-                              vertical: 15,
+                              vertical: 10,
                             ), // Smaller padding
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -136,7 +136,7 @@ class MyPlanPage extends StatelessWidget {
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 60,
-                              vertical: 15,
+                              vertical: 10,
                             ), // Smaller padding
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),

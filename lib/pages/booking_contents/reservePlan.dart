@@ -73,18 +73,30 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
               // Weekly
               GestureDetector(
                 onTap: () {
+                  // Combine selected date and time
+                  final arrivalDateTime = DateTime(
+                    _selectedDate.year,
+                    _selectedDate.month,
+                    _selectedDate.day,
+                    _selectedTime.hour,
+                    _selectedTime.minute,
+                  );
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => PaymentPage(
                         planName: "Weekly",
                         planPrice: "599/w",
-                        planColor: Color(0xFF3B060A),
-                        textColor: Colors.white,
-                        parkingData: widget.parkingData, // Add this
-                        selectedSlot: widget.selectedSlot, // Add this
-                        selectedFloor: widget.selectedFloor, // Add this
-                        selectedVehicle: widget.selectedVehicle, // Add this
+                        planColor: Color(0xFFFDF7D8),
+                        textColor: Color(0xFF3B060A),
+                        parkingData: widget.parkingData,
+                        selectedSlot: widget.selectedSlot,
+                        selectedFloor: widget.selectedFloor,
+                        selectedVehicle: widget.selectedVehicle,
+                        isReservation: true, // Add this flag
+                        arrivalDateTime: arrivalDateTime, // Add selected datetime
+                        transactionType: "reservation", // Add this parameter
                       ),
                     ),
                   );
@@ -119,18 +131,31 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
               // Monthly
               GestureDetector(
                 onTap: () {
+                  // Combine selected date and time
+                  final arrivalDateTime = DateTime(
+                    _selectedDate.year,
+                    _selectedDate.month,
+                    _selectedDate.day,
+                    _selectedTime.hour,
+                    _selectedTime.minute,
+                  );
+
+                  // In your ReservePlanPage, when navigating to PaymentPage
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => PaymentPage(
                         planName: "Monthly",
-                        planPrice: "1299/m",
-                        planColor: Color(0xFF3B060A),
+                        planPrice: "750/m",
+                        planColor: Color(0xFF3B060A).withOpacity(0.8), // Changed color
                         textColor: Colors.white,
-                        parkingData: widget.parkingData, // Add this
-                        selectedSlot: widget.selectedSlot, // Add this
-                        selectedFloor: widget.selectedFloor, // Add this
-                        selectedVehicle: widget.selectedVehicle, // Add this
+                        parkingData: widget.parkingData,
+                        selectedSlot: widget.selectedSlot,
+                        selectedFloor: widget.selectedFloor,
+                        selectedVehicle: widget.selectedVehicle,
+                        isReservation: true, // Add this flag
+                        arrivalDateTime: arrivalDateTime, // Add selected datetime
+                        transactionType: "reservation", // Add this parameter
                       ),
                     ),
                   );
@@ -171,18 +196,30 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
               // Yearly
               GestureDetector(
                 onTap: () {
+                  // Combine selected date and time
+                  final arrivalDateTime = DateTime(
+                    _selectedDate.year,
+                    _selectedDate.month,
+                    _selectedDate.day,
+                    _selectedTime.hour,
+                    _selectedTime.minute,
+                  );
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => PaymentPage(
                         planName: "Yearly",
-                        planPrice: "30000/yr",
-                        planColor: Color(0xFF3B060A),
+                        planPrice: "30000/y",
+                        planColor: Color(0xFF3B060A).withOpacity(0.8), // Changed color
                         textColor: Colors.white,
-                        parkingData: widget.parkingData, // Add this
-                        selectedSlot: widget.selectedSlot, // Add this
-                        selectedFloor: widget.selectedFloor, // Add this
-                        selectedVehicle: widget.selectedVehicle, // Add this
+                        parkingData: widget.parkingData,
+                        selectedSlot: widget.selectedSlot,
+                        selectedFloor: widget.selectedFloor,
+                        selectedVehicle: widget.selectedVehicle,
+                        isReservation: true, // Add this flag
+                        arrivalDateTime: arrivalDateTime, // Add selected datetime
+                        transactionType: "reservation", // Add this parameter
                       ),
                     ),
                   );

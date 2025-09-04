@@ -68,6 +68,9 @@ flutter:
     - assets/bank_icon.png
     - assets/back_icon.png
     - assets/checkMark_icon.png
+    - assets/display.png
+    - assets/identity.png
+    - assets/imgicon.png
 flutter_icons:
   android: true
   ios: true

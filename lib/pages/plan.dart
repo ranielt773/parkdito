@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:parkditto/api/api_service.dart';
 import 'package:parkditto/pages/booking_contents/booking_status.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PlanPage extends StatefulWidget {
   const PlanPage({super.key});
@@ -10,53 +15,60 @@ class PlanPage extends StatefulWidget {
 
 class _PlanPageState extends State<PlanPage> {
   String selectedTab = "All";
+  List<Map<String, dynamic>> bookings = [];
+  bool isLoading = true;
+  int? userId;
 
-  // Mock data for prototype
-  final List<Map<String, String>> bookings = [
-    {
-      "status": "Reserved",
-      "title": "Farmlane Parking",
-      "location": "Bae Laguna near Jollibee",
-      "slot": "Slot 4",
-      "date": "April 25 - May 25",
-    },
-    {
-      "status": "Ongoing",
-      "title": "City Mall Parking",
-      "location": "Sta. Rosa Laguna",
-      "slot": "Slot 12",
-      "date": "May 1 - May 3",
-    },
-    {
-      "status": "Canceled",
-      "title": "Festival Mall Parking",
-      "location": "Alabang",
-      "slot": "Slot 7",
-      "date": "May 10 - May 12",
-    },
-    {
-      "status": "Ongoing",
-      "title": "SM Parking",
-      "location": "Calamba",
-      "slot": "Slot 2",
-      "date": "May 15 - May 20",
-    },
-    {
-      "status": "Reserved",
-      "title": "Ayala Parking",
-      "location": "Makati",
-      "slot": "Slot 5",
-      "date": "June 1 - June 5",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadUserDataAndBookings();
+  }
+
+  Future<void> _loadUserDataAndBookings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userDataString = prefs.getString('userData');
+
+      if (userDataString != null) {
+        final userData = jsonDecode(userDataString);
+        setState(() {
+          userId = userData['id'];
+        });
+
+        await _fetchBookings();
+      }
+    } catch (e) {
+      print("Error loading user data: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchBookings() async {
+    try {
+      if (userId == null) return;
+
+      final bookingsData = await ApiService.getUserBookings(userId!);
+      setState(() {
+        bookings = List<Map<String, dynamic>>.from(bookingsData);
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching bookings: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     // Filter bookings based on tab
-    List<Map<String, String>> filteredBookings =
-        selectedTab == "All"
-            ? bookings
-            : bookings.where((b) => b["status"] == selectedTab).toList();
+    List<Map<String, dynamic>> filteredBookings = selectedTab == "All"
+        ? bookings
+        : bookings.where((b) => b["status"]?.toString().toLowerCase() == selectedTab.toLowerCase()).toList();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -120,7 +132,9 @@ class _PlanPageState extends State<PlanPage> {
         ),
       ),
 
-      body: Column(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
         children: [
           // Tabs
           SingleChildScrollView(
@@ -128,37 +142,39 @@ class _PlanPageState extends State<PlanPage> {
             child: Row(
               children: [
                 bookingTab("All"),
-                bookingTab("Reserved"),
-                bookingTab("Ongoing"),
-                bookingTab("Canceled"),
+                bookingTab("pending"),
+                bookingTab("ongoing"),
+                bookingTab("cancelled"),
+                bookingTab("completed"),
               ],
             ),
           ),
 
           // Booking List
           Expanded(
-            child:
-                filteredBookings.isEmpty
-                    ? const Center(
-                      child: Text(
-                        "No bookings available",
-                        style: TextStyle(color: Colors.black54, fontSize: 16),
-                      ),
-                    )
-                    : ListView.builder(
-                      padding: const EdgeInsets.all(10),
-                      itemCount: filteredBookings.length,
-                      itemBuilder: (context, index) {
-                        final booking = filteredBookings[index];
-                        return bookingCard(
-                          status: booking["status"]!,
-                          title: booking["title"]!,
-                          location: booking["location"]!,
-                          slot: booking["slot"]!,
-                          date: booking["date"]!,
-                        );
-                      },
-                    ),
+            child: filteredBookings.isEmpty
+                ? const Center(
+              child: Text(
+                "No bookings available",
+                style: TextStyle(color: Colors.black54, fontSize: 16),
+              ),
+            )
+                : ListView.builder(
+              padding: const EdgeInsets.all(10),
+              itemCount: filteredBookings.length,
+              itemBuilder: (context, index) {
+                final booking = filteredBookings[index];
+                return bookingCard(
+                  status: booking["status"]?.toString() ?? "pending",
+                  title: booking["title"]?.toString() ?? "Unknown Parking",
+                  location: booking["location"]?.toString() ?? "Unknown Location",
+                  slot: booking["slot"]?.toString() ?? "Slot Unknown",
+                  date: booking["formatted_date"]?.toString() ?? "No date",
+                  remainingTime: booking["remaining_time"]?.toString() ?? "No time",
+                  imageUrl: booking["image_url"]?.toString() ?? "",
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -199,6 +215,8 @@ class _PlanPageState extends State<PlanPage> {
     required String location,
     required String slot,
     required String date,
+    required String remainingTime,
+    required String imageUrl,
   }) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -224,14 +242,39 @@ class _PlanPageState extends State<PlanPage> {
                     topLeft: Radius.circular(5),
                     topRight: Radius.circular(5),
                   ),
-                  child: Image.asset(
-                    "assets/farmlae_parking.png",
+                  child: imageUrl.isNotEmpty
+                      ? Image.network(
+                    "http://192.168.68.73/$imageUrl", // Update with your server IP
                     height: 150,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: 120,
+                      width: double.infinity,
+                      child: Center(
+                        child: Image.asset(
+                          "assets/imgicon.png",
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  )
+                      : Container(
+                    height: 150,
+                    width: double.infinity,
+                    color: Colors.grey.shade300,
+                    child: Center(
+                      child: Image.asset(
+                        "assets/imgicon.png",
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                 ),
               ),
+
               Positioned(
                 top: 10,
                 left: 10,
@@ -262,11 +305,12 @@ class _PlanPageState extends State<PlanPage> {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
+                     color:  Color(0xFF3B060A),
                   ),
                 ),
-                Text(location, style: const TextStyle(color: Colors.black54)),
+                Text(location, style: const TextStyle(color: Color(0xFF3B060A))),
                 const SizedBox(height: 8),
 
                 // Date + Slot
@@ -277,14 +321,14 @@ class _PlanPageState extends State<PlanPage> {
                       date,
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: Colors.black87,
-                        fontSize: 20,
+                        color: Color(0xFF3B060A),
+                        fontSize: 16,
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
+                        horizontal: 30,
+                        vertical: 15,
                       ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFDF7D8),
@@ -301,41 +345,38 @@ class _PlanPageState extends State<PlanPage> {
                   ],
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
 
                 // View Button
                 Align(
                   alignment: Alignment.centerRight,
                   child: Builder(
-                    builder:
-                        (buttonContext) => ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3B060A),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                    builder: (buttonContext) => ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B060A),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          buttonContext,
+                          MaterialPageRoute(
+                            builder: (context) => BookingStatusPage(
+                              parkingName: title,
+                              location: location,
+                              slotNumber: slot,
+                              dateRange: date,
+                              remainingTime: remainingTime,
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              buttonContext,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => BookingStatusPage(
-                                      parkingName: title,
-                                      location: location,
-                                      slotNumber: slot,
-                                      dateRange: date,
-                                      remainingTime:
-                                          "15 days 5 hours 12 mins 48 secs",
-                                    ),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "View",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
+                        );
+                      },
+                      child: const Text(
+                        "View",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ),
                 ),
               ],

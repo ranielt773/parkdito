@@ -67,14 +67,15 @@ class PlanPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => PaymentPage(
-                        planName: "Monthly",
-                        planPrice: "2500/m",
-                        planColor: Color(0xFF3B060A),
-                        textColor: Colors.white,
+                        planName: "Weekly",
+                        planPrice: "750/wk",
+                        planColor: Color(0xFFFDF7D8),
+                        textColor: Color(0xFF3B060A),
                         parkingData: parkingData,
                         selectedSlot: selectedSlot,
                         selectedFloor: selectedFloor,
                         selectedVehicle: selectedVehicle,
+                        transactionType: "booking", // Add this parameter
                       ),
                     ),
                   );
@@ -114,13 +115,14 @@ class PlanPage extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => PaymentPage(
                         planName: "Monthly", // Changed from Monthly to Weekly
-                        planPrice: "1000/m", // Changed from 2500/m to 750/wk
-                        planColor: Color(0xFFFDF7D8), // Changed color
-                        textColor: Colors.black, // Changed text color
+                        planPrice: "2500/m", // Changed from 2500/m to 750/wk
+                        planColor: Color(0xFF3B060A).withOpacity(0.8), // Changed color
+                        textColor: Colors.white, // Changed text color
                         parkingData: parkingData,
                         selectedSlot: selectedSlot,
                         selectedFloor: selectedFloor,
                         selectedVehicle: selectedVehicle,
+                        transactionType: "booking", // Add this parameter
                       ),
                     ),
                   );
@@ -166,13 +168,14 @@ class PlanPage extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => PaymentPage(
                         planName: "Yearly", // Changed from Monthly to Weekly
-                        planPrice: "5499/y", // Changed from 2500/m to 750/wk
-                        planColor: Color(0xFFFDF7D8), // Changed color
-                        textColor: Colors.black, // Changed text color
+                        planPrice: "30000/yr", // Changed from 2500/m to 750/wk
+                        planColor: Color(0xFF3B060A).withOpacity(0.8), // Changed color
+                        textColor: Colors.white, // Changed text color
                         parkingData: parkingData,
                         selectedSlot: selectedSlot,
                         selectedFloor: selectedFloor,
                         selectedVehicle: selectedVehicle,
+                        transactionType: "booking", // Add this parameter
                       ),
                     ),
                   );

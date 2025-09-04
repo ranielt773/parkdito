@@ -97,18 +97,13 @@ class _ProfilePageState extends State<ProfilePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            InkWell(
-              onTap: () => Navigator.pop(context),
-              child: Image.asset(
-                "assets/back.png",
-                width: 40,
-                height: 40,
-              ),
+            const SizedBox(
+              width: 40, // keeps balance with back button width
             ),
             Column(
               children: [
                 const Text(
-                  "Profile",
+                  "User Profile",
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -127,19 +122,29 @@ class _ProfilePageState extends State<ProfilePage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
         children: <Widget>[
-          const SizedBox(height: 10),
-          // Profile Picture with border
-          Center(
-            child: Container(
-              child: const CircleAvatar(
-                radius: 45,
-                backgroundImage: AssetImage(
-                  "lib/assets/logo.png",
-                ), // Replace with your image
+          const SizedBox(height: 20),
+          // Profile Picture with circular container
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Color(0xFF3B060A).withOpacity(0.3),
+                width: 2,
+              ),
+              color: Colors.white,
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                "assets/display.png",
+                fit: BoxFit.cover,
+                width: 45,
+                height: 45,
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 15),
           // Display username if available
           if (userData != null && userData!['username'] != null)
             Text(
@@ -154,58 +159,67 @@ class _ProfilePageState extends State<ProfilePage> {
 
           // Options List
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-              children: [
-                buildMenuItem(
-                  "Personal Details",
-                  onTap: () {
-                    _navigateToPersonalDetails(context);
-                  },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Color(0xFFFDF7D8).withOpacity(0.53),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                buildMenuItem(
-                  "Plan Status",
-                  onTap: () {
-                    _navigateToMyPlan(context);
-                  },
-                ),
-                buildMenuItem(
-                  "Change Password",
-                  onTap: () {
-                    _navigateToChangePassword(context);
-                  },
-                ),
-                buildMenuItem("Settings", onTap: () {}),
-                const SizedBox(height: 30),
+              ),
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                children: [
+                  buildMenuItem(
+                    "Personal Details",
+                    onTap: () {
+                      _navigateToPersonalDetails(context);
+                    },
+                  ),
+                  buildMenuItem(
+                    "Plan Status",
+                    onTap: () {
+                      _navigateToMyPlan(context);
+                    },
+                  ),
+                  buildMenuItem(
+                    "Change Password",
+                    onTap: () {
+                      _navigateToChangePassword(context);
+                    },
+                  ),
+                  buildMenuItem("Settings", onTap: () {}),
+                  const SizedBox(height: 30),
 
-                // Sign Out Button
-                Center(
-                  child: ElevatedButton.icon(
-                    onPressed: _handleLogout,
-                    icon: const Icon(Icons.logout, color: Colors.white),
-                    label: const Text(
-                      "Sign out",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins',
-                        letterSpacing: 0.5,
+                  // Sign Out Button
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: _handleLogout,
+                      icon: const Icon(Icons.logout, color: Colors.white),
+                      label: const Text(
+                        "Sign out",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4C0B0B),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 60,
-                        vertical: 3,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4C0B0B),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 60,
+                          vertical: 3,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -217,7 +231,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget buildMenuItem(String title, {VoidCallback? onTap}) {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+      elevation: 0,
+      color: Color(0xFF3B060A).withOpacity(0.04),
       child: Container(
         padding: const EdgeInsets.only(left: 50, right: 10),
         child: ListTile(
@@ -226,14 +242,14 @@ class _ProfilePageState extends State<ProfilePage> {
             title,
             style: const TextStyle(
               fontSize: 16,
-              color: Color(0xFF4C0B0B),
+              color: Color(0xFF3B060A),
               fontWeight: FontWeight.bold,
             ),
           ),
           trailing: const Icon(
             Icons.arrow_forward_ios,
             size: 16,
-            color: Color(0xFF4C0B0B),
+            color: Color(0xFF3B060A),
           ),
           onTap: onTap,
         ),
