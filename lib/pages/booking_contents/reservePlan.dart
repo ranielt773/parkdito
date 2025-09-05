@@ -3,19 +3,22 @@ import 'package:intl/intl.dart';
 import 'stormPass.dart';
 import 'payment.dart';
 
-
-
 class ReservePlanPage extends StatefulWidget {
   final Map<String, dynamic> parkingData;
   final int selectedSlot;
   final String selectedFloor;
   final String selectedVehicle;
+  final String parkingName; // Add this
+  final String location; // Add this
+
   const ReservePlanPage({
     super.key,
     required this.parkingData,
     required this.selectedSlot,
     required this.selectedFloor,
     required this.selectedVehicle,
+    required this.parkingName, // Add this
+    required this.location, // Add this
   });
 
   @override
@@ -66,8 +69,6 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                 ],
               ),
 
-
-
               const SizedBox(height: 20),
 
               // Weekly
@@ -94,6 +95,8 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                         selectedSlot: widget.selectedSlot,
                         selectedFloor: widget.selectedFloor,
                         selectedVehicle: widget.selectedVehicle,
+                        parkingName: widget.parkingName, // Fixed: use widget.parkingName
+                        location: widget.location, // Fixed: use widget.location
                         isReservation: true, // Add this flag
                         arrivalDateTime: arrivalDateTime, // Add selected datetime
                         transactionType: "reservation", // Add this parameter
@@ -153,6 +156,8 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                         selectedSlot: widget.selectedSlot,
                         selectedFloor: widget.selectedFloor,
                         selectedVehicle: widget.selectedVehicle,
+                        parkingName: widget.parkingName, // Fixed: use widget.parkingName
+                        location: widget.location, // Fixed: use widget.location
                         isReservation: true, // Add this flag
                         arrivalDateTime: arrivalDateTime, // Add selected datetime
                         transactionType: "reservation", // Add this parameter
@@ -217,6 +222,8 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                         selectedSlot: widget.selectedSlot,
                         selectedFloor: widget.selectedFloor,
                         selectedVehicle: widget.selectedVehicle,
+                        location: widget.location, // Fixed: use widget.location
+                        parkingName: widget.parkingName, // Fixed: use widget.parkingName
                         isReservation: true, // Add this flag
                         arrivalDateTime: arrivalDateTime, // Add selected datetime
                         transactionType: "reservation", // Add this parameter
@@ -274,7 +281,7 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                   Expanded(
                     child: Column(
                       crossAxisAlignment:
-                          CrossAxisAlignment.start, // left align
+                      CrossAxisAlignment.start, // left align
                       children: [
                         const Text(
                           "Date",
@@ -334,7 +341,7 @@ class _ReservePlanPageState extends State<ReservePlanPage> {
                   Expanded(
                     child: Column(
                       crossAxisAlignment:
-                          CrossAxisAlignment.start, // left align
+                      CrossAxisAlignment.start, // left align
                       children: [
                         const Text(
                           "Time",

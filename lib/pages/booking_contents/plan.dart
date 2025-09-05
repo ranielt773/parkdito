@@ -9,13 +9,18 @@ class PlanPage extends StatelessWidget {
   final int selectedSlot;
   final String selectedFloor;
   final String selectedVehicle;
-  const PlanPage({
-    super.key,
-    required this.parkingData,
-    required this.selectedSlot,
-    required this.selectedFloor,
-    required this.selectedVehicle,
-  });
+  final String parkingName; // Add this
+  final String location; // Add this
+
+    const PlanPage({
+      super.key,
+      required this.parkingData,
+      required this.selectedSlot,
+      required this.selectedFloor,
+      required this.selectedVehicle,
+      required this.parkingName, // Add this
+      required this.location, // Add this
+    });
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +80,8 @@ class PlanPage extends StatelessWidget {
                         selectedSlot: selectedSlot,
                         selectedFloor: selectedFloor,
                         selectedVehicle: selectedVehicle,
+                        parkingName: parkingName, // Add this
+                        location: location, // Add this
                         transactionType: "booking", // Add this parameter
                       ),
                     ),
@@ -122,6 +129,8 @@ class PlanPage extends StatelessWidget {
                         selectedSlot: selectedSlot,
                         selectedFloor: selectedFloor,
                         selectedVehicle: selectedVehicle,
+                        parkingName: parkingName, // Add this
+                        location: location, // Add this
                         transactionType: "booking", // Add this parameter
                       ),
                     ),
@@ -175,6 +184,8 @@ class PlanPage extends StatelessWidget {
                         selectedSlot: selectedSlot,
                         selectedFloor: selectedFloor,
                         selectedVehicle: selectedVehicle,
+                        parkingName: parkingName, // Add this
+                        location: location, // Add this
                         transactionType: "booking", // Add this parameter
                       ),
                     ),

@@ -3,7 +3,7 @@ import 'package:parkditto/api/api_service.dart';
 import 'package:parkditto/login.dart';
 import 'profile/details.dart';
 import 'profile/password.dart';
-import 'profile/plan.dart'; // Import your API service
+import 'profile/plan.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -136,11 +136,39 @@ class _ProfilePageState extends State<ProfilePage> {
               color: Colors.white,
             ),
             child: ClipOval(
-              child: Image.asset(
+              child: userData != null &&
+                  userData!['display_photo'] != null &&
+                  userData!['display_photo'].toString().isNotEmpty
+                  ? Image.network(
+                'http://192.168.68.65/parkditto_api/${userData!['display_photo']}',
+                fit: BoxFit.cover,
+                width: 100,
+                height: 100,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    "assets/display.png",
+                    fit: BoxFit.cover,
+                    width: 100,
+                    height: 100,
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+              )
+                  : Image.asset(
                 "assets/display.png",
                 fit: BoxFit.cover,
-                width: 45,
-                height: 45,
+                width: 100,
+                height: 100,
               ),
             ),
           ),
@@ -152,6 +180,16 @@ class _ProfilePageState extends State<ProfilePage> {
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Color(0xFF3B060A),
+              ),
+            ),
+          // Display full name if available
+          if (userData != null &&
+              (userData!['first_name'] != null || userData!['last_name'] != null))
+            Text(
+              '${userData!['first_name'] ?? ''} ${userData!['last_name'] ?? ''}',
+              style: const TextStyle(
+                fontSize: 16,
                 color: Color(0xFF3B060A),
               ),
             ),

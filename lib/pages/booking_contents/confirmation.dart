@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:parkditto/pages/booking_contents/booking_status.dart';
 import 'package:parkditto/mainpage.dart';
 
 class ConfirmationPage extends StatelessWidget {
@@ -9,6 +10,9 @@ class ConfirmationPage extends StatelessWidget {
   final int? selectedSlot;
   final String? selectedFloor;
   final String? selectedVehicle;
+  final bool isReservation;
+  final String parkingName; // Add this
+  final String location; // Add this
 
   const ConfirmationPage({
     super.key,
@@ -18,14 +22,35 @@ class ConfirmationPage extends StatelessWidget {
     this.selectedSlot,
     this.selectedFloor,
     this.selectedVehicle,
-    required bool isReservation,
+    required this.isReservation,
+    required this.parkingName, // Add this
+    required this.location, // Add this
   });
+  String _calculateRemainingTime() {
+    if (transactionData != null && transactionData!['expiry_time'] != null) {
+      try {
+        final expiryTime = DateTime.parse(transactionData!['expiry_time']);
+        final now = DateTime.now();
+        final difference = expiryTime.difference(now);
+
+        final days = difference.inDays;
+        final hours = difference.inHours.remainder(24);
+        final minutes = difference.inMinutes.remainder(60);
+        final seconds = difference.inSeconds.remainder(60);
+
+        return '$days days $hours hours $minutes mins $seconds secs';
+      } catch (e) {
+        return "Calculating...";
+      }
+    }
+    return "Calculating...";
+  }
 
   @override
   Widget build(BuildContext context) {
     // Get data from transaction or use passed parameters
     String refNumber = transactionData?['ref_number']?.toString() ?? "7463164871236";
-
+    String remainingTime = _calculateRemainingTime();
     // Calculate amount - use transaction amount first, then plan price as fallback
     String amount = "₱2500"; // Default
     if (transactionData != null && transactionData!['amount'] != null) {
@@ -69,10 +94,19 @@ class ConfirmationPage extends StatelessWidget {
       backgroundColor: const Color(0xFFFFFFFF),
       body: WillPopScope(
         onWillPop: () async {
-          // Navigate to main page when back button is pressed
+          // Navigate to booking status page when back button is pressed
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => MainPage()),
+            MaterialPageRoute(
+              builder: (context) => BookingStatusPage(
+                parkingName: "Parking Name", // You might want to pass actual data here
+                location: "Location", // You might want to pass actual data here
+                slotNumber: selectedSlot != null ? "Slot $selectedSlot" : "--",
+                dateRange: dateTime,
+                remainingTime: "Calculating...",
+                floor: selectedFloor ?? "Unknown Floor",
+              ),
+            ),
                 (Route<dynamic> route) => false,
           );
           return false; // Prevent default back behavior
@@ -243,11 +277,18 @@ class ConfirmationPage extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            // Navigate to main page (which includes the bottom navigation)
-                            // and clear the navigation stack
                             Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (context) => MainPage()),
+                              MaterialPageRoute(
+                                builder: (context) => BookingStatusPage(
+                                  parkingName: parkingName,
+                                  location: location,
+                                  slotNumber: selectedSlot != null ? "Slot $selectedSlot" : "--",
+                                  dateRange: dateTime,
+                                  remainingTime: remainingTime, // Use calculated remaining time
+                                  floor: selectedFloor ?? "Unknown Floor",
+                                ),
+                              ),
                                   (Route<dynamic> route) => false,
                             );
                           },

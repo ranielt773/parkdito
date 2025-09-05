@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:parkditto/api/api_service.dart';
 
 class PersonalDetailsPage extends StatefulWidget {
@@ -24,6 +26,12 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
   XFile? _capturedImage;
   bool _showCamera = false;
   bool _isEditing = false;
+  File? _selectedDisplayPhoto;
+  File? _selectedIdPicture;
+  String? _displayPhotoUrl;
+  String? _idPictureUrl;
+  bool _isUploading = false;
+  bool _hasIdPicture = false;
 
   @override
   void initState() {
@@ -33,6 +41,9 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
       _firstNameController.text = widget.userData!['first_name'] ?? '';
       _lastNameController.text = widget.userData!['last_name'] ?? '';
       _emailController.text = widget.userData!['email'] ?? '';
+      _displayPhotoUrl = widget.userData!['display_photo'];
+      _idPictureUrl = widget.userData!['id_picture'];
+      _hasIdPicture = _idPictureUrl != null && _idPictureUrl!.isNotEmpty;
     }
     _initializeCamera();
   }
@@ -73,6 +84,8 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
 
       setState(() {
         _capturedImage = picture;
+        _selectedIdPicture = File(picture.path);
+        _hasIdPicture = true;
         _showCamera = false;
       });
 
@@ -90,8 +103,18 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
   void _retakePicture() {
     setState(() {
       _capturedImage = null;
+      _selectedIdPicture = null;
+      _hasIdPicture = _idPictureUrl != null && _idPictureUrl!.isNotEmpty;
       _showCamera = true;
       _startCamera();
+    });
+  }
+
+  void _removeIdPicture() {
+    setState(() {
+      _selectedIdPicture = null;
+      _hasIdPicture = false;
+      _idPictureUrl = null;
     });
   }
 
@@ -103,32 +126,105 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
     });
   }
 
-  Future<void> _updateProfile() async {
-    try {
-      // This is a placeholder - you'll need to create an update API endpoint
-      // await ApiService.updateProfile(
-      //   _firstNameController.text,
-      //   _lastNameController.text,
-      //   _emailController.text,
-      // );
+  // Add this method to pick display photo
+  Future<void> _pickDisplayPhoto() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile updated successfully'),
-          backgroundColor: Colors.green,
-        ),
+    if (image != null) {
+      setState(() {
+        _selectedDisplayPhoto = File(image.path);
+      });
+    }
+  }
+
+  Future<void> _updateProfile() async {
+    if (!_isEditing) {
+      setState(() {
+        _isEditing = true;
+      });
+      return;
+    }
+
+    setState(() {
+      _isUploading = true;
+    });
+
+    try {
+      final userData = await ApiService.getUserData();
+      final userId = userData!['id'];
+
+      String? displayPhotoPath;
+      String? idPicturePath;
+
+      // Upload display photo if selected
+      if (_selectedDisplayPhoto != null) {
+        final displayPhotoResponse = await ApiService.uploadImage(
+            _selectedDisplayPhoto!,
+            userId,
+            'display_photo'
+        );
+        displayPhotoPath = displayPhotoResponse['file_path'];
+      }
+
+      // Upload ID picture if captured/selected
+      if (_selectedIdPicture != null) {
+        final idPictureResponse = await ApiService.uploadImage(
+            _selectedIdPicture!,
+            userId,
+            'id_picture'
+        );
+        idPicturePath = idPictureResponse['file_path'];
+      }
+
+      // Update profile with the new data
+      final response = await ApiService.updateProfileWithImages(
+        userId,
+        _firstNameController.text,
+        _lastNameController.text,
+        displayPhotoPath: displayPhotoPath,
+        idPicturePath: idPicturePath,
       );
 
-      setState(() {
-        _isEditing = false;
-      });
+      if (response['success']) {
+        // Update local user data
+        final updatedUserData = {
+          ...userData,
+          'first_name': _firstNameController.text,
+          'last_name': _lastNameController.text,
+          'display_photo': displayPhotoPath ?? _displayPhotoUrl,
+          'id_picture': idPicturePath ?? _idPictureUrl,
+        };
+
+        await ApiService.saveUserData(updatedUserData);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        setState(() {
+          _isEditing = false;
+          _displayPhotoUrl = displayPhotoPath ?? _displayPhotoUrl;
+          _idPictureUrl = idPicturePath ?? _idPictureUrl;
+          _hasIdPicture = _idPictureUrl != null && _idPictureUrl!.isNotEmpty;
+        });
+      } else {
+        throw Exception(response['message'] ?? 'Failed to update profile');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to update profile'),
+        SnackBar(
+          content: Text('Failed to update profile: $e'),
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
     }
   }
 
@@ -140,7 +236,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Camera view
+    // Camera view (keep this part the same)
     if (_showCamera) {
       return Scaffold(
         backgroundColor: Colors.black,
@@ -281,12 +377,34 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                     color: Colors.white,
                   ),
                   child: ClipOval(
-                    child: Image.asset(
+                    child: _selectedDisplayPhoto != null
+                        ? Image.file(
+                      _selectedDisplayPhoto!,
+                      fit: BoxFit.cover,
+                      width: 100,
+                      height: 100,
+                    )
+                        : (_displayPhotoUrl != null && _displayPhotoUrl!.isNotEmpty
+                        ? Image.network(
+                      'http://192.168.68.65/parkditto_api/$_displayPhotoUrl',
+                      fit: BoxFit.cover,
+                      width: 100,
+                      height: 100,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          "assets/display.png",
+                          fit: BoxFit.cover,
+                          width: 100,
+                          height: 100,
+                        );
+                      },
+                    )
+                        : Image.asset(
                       "assets/display.png",
                       fit: BoxFit.cover,
                       width: 100,
                       height: 100,
-                    ),
+                    )),
                   ),
                 ),
 
@@ -294,22 +412,24 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                 Positioned(
                   bottom: 0,
                   right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFF3B060A),
-                    ),
-                    child: const Icon(
-                      Icons.camera_alt,
-                      size: 20,
-                      color: Colors.white,
+                  child: GestureDetector(
+                    onTap: _isEditing ? _pickDisplayPhoto : null,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFF3B060A),
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt,
+                        size: 20,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-
 
             const SizedBox(height: 30),
 
@@ -319,8 +439,8 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20)
                     .copyWith(top: 25, bottom: 50),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDF7D8).withOpacity(0.53),
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20))
+                    color: const Color(0xFFFDF7D8).withOpacity(0.53),
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20))
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -414,7 +534,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                           const SizedBox(height: 8),
                           TextField(
                             controller: _emailController,
-                            enabled: _isEditing,
+                            enabled: false, // Email should not be editable
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Color(0xFF3B060A).withOpacity(0.04),
@@ -436,67 +556,25 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                       ),
                       const SizedBox(height: 25),
 
-                      // Senior Citizen/PWD + Scan Button
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      // ID Picture Section - Always visible
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Expanded(
-                            child: Text(
-                              "Are you senior citizen/PWD?",
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.brown,
-                                letterSpacing: 0.3,
-                              ),
+                          const Text(
+                            "ID Picture",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4C0B0B),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: _startCamera,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.brown,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.zero,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 15,
-                                vertical: 8,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text(
-                                  "Scan ID",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.brown,
-                                    letterSpacing: 0.3,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Image.asset(
-                                  "assets/identity.png",
-                                  width: 24,
-                                  height: 24,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                          const SizedBox(height: 8),
 
-                      const SizedBox(height: 15),
-
-                      // Show captured image if available
-                      if (_capturedImage != null)
-                        Column(
-                          children: [
+                          // Show ID picture if available
+                          if (_hasIdPicture)
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
@@ -504,50 +582,109 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                               ),
                               child: Column(
                                 children: [
-                                  Text(
-                                    "ID Scanned Successfully!",
+                                  const Text(
+                                    "ID Verified",
                                     style: TextStyle(
-                                      color: Colors.green[700],
+                                      color: Colors.green,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                   const SizedBox(height: 10),
-                                  Image.file(
-                                    File(_capturedImage!.path),
-                                    height: 120,
+                                  Container(
+                                    height: 200,
                                     width: double.infinity,
-                                    fit: BoxFit.contain,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.grey),
+                                    ),
+                                    child: _selectedIdPicture != null
+                                        ? Image.file(
+                                      _selectedIdPicture!,
+                                      fit: BoxFit.contain,
+                                    )
+                                        : (_idPictureUrl != null && _idPictureUrl!.isNotEmpty
+                                        ? Image.network(
+                                      'http://192.168.68.65/parkditto_api/$_idPictureUrl',
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return const Icon(Icons.error, color: Colors.red);
+                                      },
+                                    )
+                                        : const Icon(Icons.credit_card, size: 50)),
                                   ),
                                   const SizedBox(height: 10),
-                                  TextButton(
-                                    onPressed: _retakePicture,
-                                    child: const Text(
-                                      "Rescan ID",
-                                      style: TextStyle(color: Colors.blue),
+                                  if (_isEditing)
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: _startCamera,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.blue,
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          child: const Text("Rescan ID"),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        ElevatedButton(
+                                          onPressed: _removeIdPicture,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          child: const Text("Remove ID"),
+                                        ),
+                                      ],
                                     ),
+                                ],
+                              ),
+                            )
+                          else
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey, width: 1),
+                              ),
+                              child: Column(
+                                children: [
+                                  const Icon(Icons.credit_card, size: 50, color: Colors.grey),
+                                  const SizedBox(height: 10),
+                                  const Text(
+                                    "No ID picture uploaded",
+                                    style: TextStyle(color: Colors.grey),
                                   ),
+                                  const SizedBox(height: 10),
+                                  if (_isEditing)
+                                    ElevatedButton(
+                                      onPressed: _startCamera,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFF4C0B0B),
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      child: const Text("Scan ID"),
+                                    ),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 15),
-                          ],
-                        ),
 
-                      // Note text
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(
-                          "Note: Please provide a valid Senior/PWD ID for verification to avail of your community perks.",
-                          style: TextStyle(fontSize: 12, color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            "Note: Please provide a valid Senior/PWD ID for verification to avail of your community perks.",
+                            style: TextStyle(fontSize: 12, color: Colors.red),
+                          ),
+                        ],
                       ),
 
                       const SizedBox(height: 25),
 
                       // Edit/Save Profile Button
-                      _isEditing
-                          ? ElevatedButton(
+                      _isUploading
+                          ? const CircularProgressIndicator()
+                          : ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF4C0B0B),
                           shape: RoundedRectangleBorder(
@@ -559,29 +696,8 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                           ),
                         ),
                         onPressed: _updateProfile,
-                        child: const Text(
-                          "Save Changes",
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      )
-                          : ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4C0B0B),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(19),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 60,
-                          ),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isEditing = true;
-                          });
-                        },
-                        child: const Text(
-                          "Edit Profile",
+                        child: Text(
+                          _isEditing ? "Save Changes" : "Edit Profile",
                           style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),

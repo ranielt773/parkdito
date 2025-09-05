@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.68.73/parkditto_api"; // Use 10.0.2.2 for Android emulator
+  static const String baseUrl = "http://192.168.68.65/parkditto_api"; // Use 10.0.2.2 for Android emulator
   // For physical device testing: Use your computer's IP address instead of localhost
 
   static Future<Map<String, dynamic>> login(String username,
@@ -440,6 +441,76 @@ class ApiService {
       return json.decode(response.body);
     } else {
       throw Exception('Failed to create booking');
+    }
+  }
+  // Add these methods to your ApiService class
+
+  static Future<Map<String, dynamic>> uploadImage(File imageFile, int userId, String type) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/upload.php'),
+      );
+
+      request.fields['user_id'] = userId.toString();
+      request.fields['type'] = type;
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'file',
+        imageFile.path,
+        filename: imageFile.path.split('/').last,
+      ));
+
+      var response = await request.send();
+      var responseData = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        return jsonDecode(responseData);
+      } else {
+        throw Exception('Failed to upload image');
+      }
+    } catch (e) {
+      throw Exception('Image upload error: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> updateProfileWithImages(
+      int userId,
+      String firstName,
+      String lastName,
+      {String? displayPhotoPath,
+        String? idPicturePath}
+      ) async {
+    try {
+      final Map<String, dynamic> requestBody = {
+        'id': userId,
+        'first_name': firstName,
+        'last_name': lastName,
+      };
+
+      if (displayPhotoPath != null) {
+        requestBody['display_photo'] = displayPhotoPath;
+      }
+
+      if (idPicturePath != null) {
+        requestBody['id_picture'] = idPicturePath;
+      }
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/update_profile.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(requestBody),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to update profile');
+      }
+    } catch (e) {
+      throw Exception('Profile update error: $e');
     }
   }
 }

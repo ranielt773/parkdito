@@ -14,6 +14,8 @@ class PaymentPage extends StatelessWidget {
   final bool isReservation;
   final DateTime? arrivalDateTime;
   final String transactionType;
+  final String parkingName; // Add this
+  final String location; // Add this
 
   const PaymentPage({
     super.key,
@@ -28,6 +30,8 @@ class PaymentPage extends StatelessWidget {
     this.isReservation = false, // Default to false
     this.arrivalDateTime, // Optional parameter
     required this.transactionType, //
+    required this.parkingName, // Add this
+    required this.location, // Add this
   });
   @override
   Widget build(BuildContext context) {
@@ -337,6 +341,8 @@ class PaymentPage extends StatelessWidget {
                             selectedFloor: selectedFloor,
                             selectedVehicle: selectedVehicle,
                             isReservation: isReservation,
+                            parkingName: parkingName, // Add this
+                            location: location, // Add this
                           ),
                         ),
                       );

@@ -8,6 +8,7 @@ class BookingStatusPage extends StatefulWidget {
   final String slotNumber;
   final String dateRange;
   final String remainingTime;
+  final String floor;
 
   const BookingStatusPage({
     super.key,
@@ -16,6 +17,7 @@ class BookingStatusPage extends StatefulWidget {
     this.slotNumber = "--",
     this.dateRange = "No date selected",
     this.remainingTime = "--",
+    this.floor = "Unknown Floor",
   });
 
   @override
@@ -23,12 +25,13 @@ class BookingStatusPage extends StatefulWidget {
 }
 
 class _BookingStatusPageState extends State<BookingStatusPage> {
-  int selectedIndex = 0; // 👈 track active tab
-
-  final List<String> tabs = ["Ground", "2nd Floor", "3rd Floor"];
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    // Use widget.floor here (not in field declaration)
+    final List<String> tabs = [widget.floor];
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -40,13 +43,12 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
             vertical: 10, // 👈 add extra top & bottom padding
           ),
           color: Colors.white,
-          child:
-          Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Back button (replaces search)
               InkWell(
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(12),
                 onTap: () {
                   Navigator.pop(context);
                 },
@@ -55,7 +57,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                   width: 40,
                   decoration: BoxDecoration(
                     color: const Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.arrow_back,
@@ -77,14 +79,14 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
 
               // Bell button
               InkWell(
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(12),
                 onTap: () {},
                 child: Container(
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
                     color: Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.notifications,
@@ -100,13 +102,13 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
 
       body: Column(
         children: [
-          // 👇 Custom Tabs (replace TabBar)
+          // 👇 Tabs (but will only have 1 item = the booking's floor)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: List.generate(
                 tabs.length,
-                (index) => GestureDetector(
+                    (index) => GestureDetector(
                   onTap: () {
                     setState(() {
                       selectedIndex = index;
@@ -118,36 +120,15 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
             ),
           ),
 
-          // 👇 Tab Content
+          // 👇 Tab Content (booking data for that floor)
           Expanded(
-            child: Builder(
-              builder: (_) {
-                if (selectedIndex == 0) {
-                  return _buildStatusContent(
-                    widget.parkingName,
-                    widget.location,
-                    widget.slotNumber,
-                    widget.dateRange,
-                    widget.remainingTime,
-                  );
-                } else if (selectedIndex == 1) {
-                  return _buildStatusContent(
-                    "2nd Floor Parking",
-                    widget.location,
-                    "Slot B12",
-                    widget.dateRange,
-                    "10 days 8 hours 43 mins 11 secs",
-                  );
-                } else {
-                  return _buildStatusContent(
-                    "3rd Floor Parking",
-                    widget.location,
-                    "Slot C8",
-                    widget.dateRange,
-                    "5 days 3 hours 49 mins 23 secs",
-                  );
-                }
-              },
+            child: _buildStatusContent(
+              widget.parkingName,
+              widget.location,
+              widget.slotNumber,
+              widget.dateRange,
+              widget.remainingTime,
+              floor: widget.floor, // 👈 use passed floor
             ),
           ),
         ],
@@ -162,7 +143,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFF3B060A) : Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         text,
@@ -176,19 +157,20 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
 
   /// Modified: accepts parameters instead of using [widget] everywhere
   Widget _buildStatusContent(
-    String parkingName,
-    String location,
-    String slotNumber,
-    String dateRange,
-    String remainingTime,
-  ) {
+      String parkingName,
+      String location,
+      String slotNumber,
+      String dateRange,
+      String remainingTime, {
+        required String floor,
+      }) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Color(0xFFFDF7D8),
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,10 +184,10 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                       color: const Color(0xFF3B060A),
                       width: 2,
                     ),
-                    borderRadius: BorderRadius.circular(5), // not so rounded
+                    borderRadius: BorderRadius.circular(8), // not so rounded
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(8),
                     child: Image.asset(
                       "assets/farmlae_parking.png",
                       height: 180,
@@ -226,7 +208,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Text(
                       "Reserved",
@@ -253,7 +235,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Image.asset(
                         "assets/cctv_icon.png",
@@ -310,7 +292,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFDF7D8),
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: Color(0xFF3B060A)),
                     ),
                     child: Text(
@@ -353,7 +335,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                 constraints: const BoxConstraints(minWidth: 230),
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Column(
                   children: [
@@ -386,7 +368,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(15),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
@@ -404,7 +386,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF3B060A),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5), // same radius
+                        borderRadius: BorderRadius.circular(15), // same radius
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
@@ -415,8 +397,10 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                           builder: (context) => PlanPage(
                             parkingData: {}, // You need to pass actual parking data here
                             selectedSlot: 0, // You need to pass actual selected slot here
-                            selectedFloor: "", // You need to pass actual selected floor here
-                            selectedVehicle: "", // You need to pass actual selected vehicle here
+                            selectedFloor: floor, // You need to pass actual selected floor here
+                            selectedVehicle: "",
+                            location: location,
+                            parkingName: parkingName,// You need to pass actual selected vehicle here
                           ),
                         ),
                       );
@@ -437,7 +421,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: const Color(0xFFFDF7D8),
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -462,7 +446,7 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                             vertical: 8,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         onPressed: () {
@@ -470,9 +454,11 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => PlanPage(
+                                parkingName:parkingName,
+                                location: location,
                                 parkingData: {}, // You need to pass actual parking data here
                                 selectedSlot: 0, // You need to pass actual selected slot here
-                                selectedFloor: "", // You need to pass actual selected floor here
+                                selectedFloor: floor, // You need to pass actual selected floor here
                                 selectedVehicle: "", // You need to pass actual selected vehicle here
                               ),
                             ),
@@ -534,12 +520,12 @@ class _PerkItem extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Color(0xFF3B060A),
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(15),
           ),
           child: Image.asset(
             imagePath,
-            height: 28,
-            width: 28,
+            height: 24,
+            width: 24,
             color: Colors.white, // keeps icons white-like
           ),
         ),

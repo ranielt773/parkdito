@@ -345,6 +345,8 @@ class _FindParkingPageState extends State<FindParkingPage> {
                                       // Use null assertion operator
                                       selectedFloor: selectedFloor,
                                       selectedVehicle: selectedVehicle,
+                                      parkingName: widget.parkingData["name"], // Add this
+                                      location: widget.parkingData["address"], // Add this
                                     )),
                               );
                             } : null,
@@ -372,9 +374,10 @@ class _FindParkingPageState extends State<FindParkingPage> {
                                     PlanPage(
                                       parkingData: widget.parkingData,
                                       selectedSlot: selectedSlot!,
-                                      // Use null assertion operator
                                       selectedFloor: selectedFloor,
                                       selectedVehicle: selectedVehicle,
+                                      parkingName: widget.parkingData["name"], // Add this
+                                      location: widget.parkingData["address"], // Add this
                                     )),
                               );
                             } : null,

@@ -79,6 +79,7 @@ class _HomePageState extends State<HomePage> {
               Container(
                 color: Colors.white,
                 padding: const EdgeInsets.fromLTRB(16, 50, 16, 12),
+
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

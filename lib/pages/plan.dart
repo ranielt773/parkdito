@@ -1,9 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:parkditto/api/api_service.dart';
 import 'package:parkditto/pages/booking_contents/booking_status.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PlanPage extends StatefulWidget {
@@ -75,28 +73,16 @@ class _PlanPageState extends State<PlanPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.fromLTRB(16, 50, 16, 12),
           color: Colors.white,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Search button
-              InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {},
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.search,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                ),
+              Image.asset(
+                "assets/search.png",
+                width: 40,
+                height: 40,
               ),
 
               // Title
@@ -134,49 +120,55 @@ class _PlanPageState extends State<PlanPage> {
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          // Tabs
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                bookingTab("All"),
-                bookingTab("pending"),
-                bookingTab("ongoing"),
-                bookingTab("cancelled"),
-                bookingTab("completed"),
-              ],
-            ),
-          ),
-
-          // Booking List
-          Expanded(
-            child: filteredBookings.isEmpty
-                ? const Center(
-              child: Text(
-                "No bookings available",
-                style: TextStyle(color: Colors.black54, fontSize: 16),
+          : Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0), // Added margin on both sides
+        child: Column(
+          children: [
+            // Tabs
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  bookingTab("All"),
+                  bookingTab("pending"),
+                  bookingTab("ongoing"),
+                  bookingTab("cancelled"),
+                  bookingTab("completed"),
+                ],
               ),
-            )
-                : ListView.builder(
-              padding: const EdgeInsets.all(10),
-              itemCount: filteredBookings.length,
-              itemBuilder: (context, index) {
-                final booking = filteredBookings[index];
-                return bookingCard(
-                  status: booking["status"]?.toString() ?? "pending",
-                  title: booking["title"]?.toString() ?? "Unknown Parking",
-                  location: booking["location"]?.toString() ?? "Unknown Location",
-                  slot: booking["slot"]?.toString() ?? "Slot Unknown",
-                  date: booking["formatted_date"]?.toString() ?? "No date",
-                  remainingTime: booking["remaining_time"]?.toString() ?? "No time",
-                  imageUrl: booking["image_url"]?.toString() ?? "",
-                );
-              },
             ),
-          ),
-        ],
+
+            const SizedBox(height: 20), // Added some spacing
+
+            // Booking List
+            Expanded(
+              child: filteredBookings.isEmpty
+                  ? const Center(
+                child: Text(
+                  "No bookings available",
+                  style: TextStyle(color: Colors.black54, fontSize: 16),
+                ),
+              )
+                  : ListView.builder(
+                padding: const EdgeInsets.all(15),
+                itemCount: filteredBookings.length,
+                itemBuilder: (context, index) {
+                  final booking = filteredBookings[index];
+                  return bookingCard(
+                    status: booking["status"]?.toString() ?? "pending",
+                    title: booking["title"]?.toString() ?? "Unknown Parking",
+                    location: booking["location"]?.toString() ?? "Unknown Location",
+                    slot: booking["slot"]?.toString() ?? "Slot Unknown",
+                    date: booking["formatted_date"]?.toString() ?? "No date",
+                    remainingTime: booking["remaining_time"]?.toString() ?? "No time",
+                    imageUrl: booking["image_url"]?.toString() ?? "",
+                    floor: booking["floor"]?.toString() ?? "Unknown Floor", // Extract floor from booking data
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -191,11 +183,11 @@ class _PlanPageState extends State<PlanPage> {
         });
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
         decoration: BoxDecoration(
           color: isActive ? const Color(0xFF3B060A) : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: Text(
           text,
@@ -208,7 +200,7 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  // Booking Card Widget
+  // Booking Card Widget (Modified Design)
   Widget bookingCard({
     required String status,
     required String title,
@@ -217,167 +209,181 @@ class _PlanPageState extends State<PlanPage> {
     required String date,
     required String remainingTime,
     required String imageUrl,
+    required String floor, // Added floor parameter
   }) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      elevation: 2,
-      color: const Color(0xFFFEFBEC),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 3,
+      color: const Color(0xFFFFF9EC),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image Placeholder
+          // Image + Status
           Stack(
             children: [
               Container(
+                margin: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
                 decoration: BoxDecoration(
+
                   border: Border.all(color: const Color(0xFF3B060A), width: 2),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(5),
                     topRight: Radius.circular(5),
+                    bottomRight: Radius.circular(5),
+                    bottomLeft: Radius.circular(5),
                   ),
                 ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(5),
-                    topRight: Radius.circular(5),
-                  ),
-                  child: imageUrl.isNotEmpty
-                      ? Image.network(
-                    "http://192.168.68.73/$imageUrl", // Update with your server IP
-                    height: 150,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      height: 120,
-                      width: double.infinity,
-                      child: Center(
-                        child: Image.asset(
-                          "assets/imgicon.png",
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  )
-                      : Container(
-                    height: 150,
-                    width: double.infinity,
-                    color: Colors.grey.shade300,
-                    child: Center(
-                      child: Image.asset(
-                        "assets/imgicon.png",
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.contain,
-                      ),
+                child: imageUrl.isNotEmpty
+                    ? Image.network(
+                  "http://192.168.68.65/parkditto_api/imgicon.png",
+                  height: 100,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                )
+                    : Container(
+                  height: 150,
+                  color: Colors.grey.shade300,
+                  child: Center(
+                    child: Image.asset(
+                      "assets/imgicon.png",
+                      width: 60,
+                      height: 60,
                     ),
                   ),
                 ),
               ),
 
+              // Status Badge
               Positioned(
-                top: 10,
+                bottom: 10,
                 left: 10,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    status,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    status[0].toUpperCase() + status.substring(1),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF3B060A),
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ),
             ],
           ),
 
-          // Details
+          // Content Section
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                     color:  Color(0xFF3B060A),
-                  ),
-                ),
-                Text(location, style: const TextStyle(color: Color(0xFF3B060A))),
-                const SizedBox(height: 8),
-
-                // Date + Slot
+                // Single row with title/location on left and slot/view on right
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      date,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF3B060A),
-                        fontSize: 16,
+                    // Title and Location (left side)
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 8,right: 5), // Margin on the right side
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF3B060A),
+                              ),
+                            ),
+                            Text(
+                              location,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            Text(
+                              date,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF3B060A),
+                                fontSize: 15,
+                              ),
+                            ),
+                            // Display floor information
+                            
+                          ],
+                        ),
                       ),
                     ),
+
+                    // Slot and View button (right side in a column)
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 15,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFDF7D8),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        slot,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.brown,
-                        ),
+                      margin: const EdgeInsets.only(right: 8), // Margin on the left side
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Slot number
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFFDF7D8),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              slot,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF3B060A),
+                              ),
+                            ),
+                          ),
+
+                          // View Button
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF3B060A),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              minimumSize: const Size(60, 30),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BookingStatusPage(
+                                    parkingName: title,
+                                    location: location,
+                                    slotNumber: slot,
+                                    dateRange: date,
+                                    remainingTime: remainingTime,
+                                    floor: floor, // Pass floor to BookingStatusPage
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "View",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-
-                const SizedBox(height: 5),
-
-                // View Button
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Builder(
-                    builder: (buttonContext) => ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B060A),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          buttonContext,
-                          MaterialPageRoute(
-                            builder: (context) => BookingStatusPage(
-                              parkingName: title,
-                              location: location,
-                              slotNumber: slot,
-                              dateRange: date,
-                              remainingTime: remainingTime,
-                            ),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        "View",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
                 ),
               ],
             ),

@@ -201,7 +201,7 @@ class _ReservePageState extends State<ReservePage> {
             // ✅ Header
             Container(
               color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(16, 60, 16, 12),
+              padding: const EdgeInsets.fromLTRB(16, 50, 16, 12),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
