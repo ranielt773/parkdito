@@ -140,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   userData!['display_photo'] != null &&
                   userData!['display_photo'].toString().isNotEmpty
                   ? Image.network(
-                'http://192.168.68.65/parkditto_api/${userData!['display_photo']}',
+                'http://192.168.68.77/parkditto_api/${userData!['display_photo']}',
                 fit: BoxFit.cover,
                 width: 100,
                 height: 100,

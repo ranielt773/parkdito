@@ -6,11 +6,13 @@ import 'OpeningScreen.dart';
 import 'login.dart';
 import 'mainpage.dart';
 import 'api/api_service.dart';
+import 'staff/mainstaff.dart'; // Import the staff page
 
 void main() async {
   await checkExpiredReservations();
   runApp(const ParkDittoApp());
 }
+
 Future<void> checkExpiredReservations() async {
   try {
     final response = await http.get(
@@ -27,6 +29,7 @@ Future<void> checkExpiredReservations() async {
     print('Error checking expired reservations: $e');
   }
 }
+
 class ParkDittoApp extends StatelessWidget {
   const ParkDittoApp({super.key});
 
@@ -56,14 +59,28 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkLoginStatus() async {
     bool isLoggedIn = await ApiService.isLoggedIn();
 
+    // Get user type if logged in
+    String userType = 'user';
+    if (isLoggedIn) {
+      userType = await ApiService.getUserType();
+    }
+
     Timer(const Duration(seconds: 2), () {
       if (!mounted) return;
 
       if (isLoggedIn) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainPage()),
-        );
+        // Navigate to appropriate page based on user type
+        if (userType == 'staff') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainStaffPage()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainPage()),
+          );
+        }
       } else {
         Navigator.pushReplacement(
           context,

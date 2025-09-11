@@ -43,57 +43,30 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
             vertical: 10, // 👈 add extra top & bottom padding
           ),
           color: Colors.white,
-          child: Row(
+          child:
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Back button (replaces search)
               InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  height: 40,
+                onTap: () => Navigator.pop(context),
+                child: Image.asset(
+                  "assets/back.png",
                   width: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 22, // 👈 matches notification icon size
-                  ),
+                  height: 40,
                 ),
               ),
-
-              // Title
               const Text(
-                "Booking Status",
+                "CCTV View",
                 style: TextStyle(
-                  color: Color(0xFF3B060A),
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                  color: Color(0xFF3B060A),
                 ),
               ),
-
-              // Bell button
-              InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {},
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.notifications,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                ),
+              Image.asset(
+                "assets/notif.png",
+                width: 40,
+                height: 40,
               ),
             ],
           ),

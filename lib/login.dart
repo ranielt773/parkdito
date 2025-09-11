@@ -3,6 +3,7 @@ import 'signup.dart';
 import 'mainpage.dart';
 import 'api/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'staff/mainstaff.dart'; // Import the staff page
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -88,11 +89,22 @@ class _LoginPageState extends State<LoginPage> {
         // Save credentials if remember me is checked
         _saveCredentials();
 
-        // Navigate to main page
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MainPage()),
-        );
+        // Navigate to appropriate page based on user type
+        final userType = response['user']['type'] ?? 'user';
+
+        if (userType == 'staff') {
+          // Navigate to staff main page
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const MainStaffPage()),
+          );
+        } else {
+          // Navigate to regular user main page
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const MainPage()),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

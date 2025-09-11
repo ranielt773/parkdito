@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.68.65/parkditto_api"; // Use 10.0.2.2 for Android emulator
+  static const String baseUrl = "http://192.168.68.77/parkditto_api"; // Use 10.0.2.2 for Android emulator
   // For physical device testing: Use your computer's IP address instead of localhost
 
   static Future<Map<String, dynamic>> login(String username,
@@ -88,7 +88,10 @@ class ApiService {
     }
     return null;
   }
-
+  static Future<String> getUserType() async {
+    final userData = await getUserData();
+    return userData?['type'] ?? 'user';
+  }
   // Check if user is logged in
   static Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();

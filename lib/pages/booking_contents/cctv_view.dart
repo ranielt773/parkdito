@@ -19,58 +19,33 @@ class _CCTVViewPageState extends State<CCTVViewPage> {
           margin: const EdgeInsets.only(top: 30),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           color: Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Back button (replaces search)
-              InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 22, // 👈 matches notification icon size
+          child:
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: Image.asset(
+                    "assets/back.png",
+                    width: 40,
+                    height: 40,
                   ),
                 ),
-              ),
-              // Title
-              const Text(
-                "CCTV View",
-                style: TextStyle(
-                  color: Color(0xFF3B060A),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-              // Bell button
-              InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {},
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
+                const Text(
+                  "CCTV View",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                     color: Color(0xFF3B060A),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.notifications,
-                    color: Colors.white,
-                    size: 22,
                   ),
                 ),
-              ),
-            ],
-          ),
+                Image.asset(
+                  "assets/notif.png",
+                  width: 40,
+                  height: 40,
+                ),
+              ],
+            ),
         ),
       ),
       body: Column(
@@ -110,12 +85,12 @@ class _CCTVViewPageState extends State<CCTVViewPage> {
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(5),
                           border: Border.all(color: Colors.grey.shade300),
                           color: Colors.white,
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(5),
                           child: Stack(
                             children: [
                               // Camera feed placeholder
@@ -338,10 +313,10 @@ class _CCTVViewPageState extends State<CCTVViewPage> {
   Widget cctvTab(String text, bool isActive) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFF3B060A) : Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: Text(
         text,

@@ -386,7 +386,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                     )
                         : (_displayPhotoUrl != null && _displayPhotoUrl!.isNotEmpty
                         ? Image.network(
-                      'http://192.168.68.65/parkditto_api/$_displayPhotoUrl',
+                      'http://192.168.68.77/parkditto_api/$_displayPhotoUrl',
                       fit: BoxFit.cover,
                       width: 100,
                       height: 100,
@@ -605,7 +605,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                                     )
                                         : (_idPictureUrl != null && _idPictureUrl!.isNotEmpty
                                         ? Image.network(
-                                      'http://192.168.68.65/parkditto_api/$_idPictureUrl',
+                                      'http://192.168.68.77/parkditto_api/$_idPictureUrl',
                                       fit: BoxFit.contain,
                                       errorBuilder: (context, error, stackTrace) {
                                         return const Icon(Icons.error, color: Colors.red);
