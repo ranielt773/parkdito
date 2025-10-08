@@ -105,6 +105,7 @@ class ConfirmationPage extends StatelessWidget {
                 dateRange: dateTime,
                 remainingTime: "Calculating...",
                 floor: selectedFloor ?? "Unknown Floor",
+
               ),
             ),
                 (Route<dynamic> route) => false,

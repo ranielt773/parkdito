@@ -59,9 +59,9 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
 
   void _startCamera() async {
     if (_cameras == null || _cameras!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No cameras available')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No cameras available')));
       return;
     }
 
@@ -89,14 +89,14 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
         _showCamera = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ID scanned successfully')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('ID scanned successfully')));
     } catch (e) {
       debugPrint('Error taking picture: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -160,9 +160,9 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
       // Upload display photo if selected
       if (_selectedDisplayPhoto != null) {
         final displayPhotoResponse = await ApiService.uploadImage(
-            _selectedDisplayPhoto!,
-            userId,
-            'display_photo'
+          _selectedDisplayPhoto!,
+          userId,
+          'display_photo',
         );
         displayPhotoPath = displayPhotoResponse['file_path'];
       }
@@ -170,9 +170,9 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
       // Upload ID picture if captured/selected
       if (_selectedIdPicture != null) {
         final idPictureResponse = await ApiService.uploadImage(
-            _selectedIdPicture!,
-            userId,
-            'id_picture'
+          _selectedIdPicture!,
+          userId,
+          'id_picture',
         );
         idPicturePath = idPictureResponse['file_path'];
       }
@@ -377,34 +377,36 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                     color: Colors.white,
                   ),
                   child: ClipOval(
-                    child: _selectedDisplayPhoto != null
-                        ? Image.file(
-                      _selectedDisplayPhoto!,
-                      fit: BoxFit.cover,
-                      width: 100,
-                      height: 100,
-                    )
-                        : (_displayPhotoUrl != null && _displayPhotoUrl!.isNotEmpty
-                        ? Image.network(
-                      'http://192.168.68.77/parkditto_api/$_displayPhotoUrl',
-                      fit: BoxFit.cover,
-                      width: 100,
-                      height: 100,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Image.asset(
-                          "assets/display.png",
-                          fit: BoxFit.cover,
-                          width: 100,
-                          height: 100,
-                        );
-                      },
-                    )
-                        : Image.asset(
-                      "assets/display.png",
-                      fit: BoxFit.cover,
-                      width: 100,
-                      height: 100,
-                    )),
+                    child:
+                        _selectedDisplayPhoto != null
+                            ? Image.file(
+                              _selectedDisplayPhoto!,
+                              fit: BoxFit.cover,
+                              width: 100,
+                              height: 100,
+                            )
+                            : (_displayPhotoUrl != null &&
+                                    _displayPhotoUrl!.isNotEmpty
+                                ? Image.network(
+                                  'http://192.168.68.87/parkditto/parkditto_api/$_displayPhotoUrl',
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 100,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      "assets/display.png",
+                                      fit: BoxFit.cover,
+                                      width: 100,
+                                      height: 100,
+                                    );
+                                  },
+                                )
+                                : Image.asset(
+                                  "assets/display.png",
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 100,
+                                )),
                   ),
                 ),
 
@@ -436,11 +438,15 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
             // Form fields in a scrollable container
             Expanded(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20)
-                    .copyWith(top: 25, bottom: 50),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                ).copyWith(top: 25, bottom: 50),
                 decoration: BoxDecoration(
-                    color: const Color(0xFFFDF7D8).withOpacity(0.53),
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20))
+                  color: const Color(0xFFFDF7D8).withOpacity(0.53),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -578,7 +584,10 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.green, width: 2),
+                                border: Border.all(
+                                  color: Colors.green,
+                                  width: 2,
+                                ),
                               ),
                               child: Column(
                                 children: [
@@ -598,25 +607,38 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(color: Colors.grey),
                                     ),
-                                    child: _selectedIdPicture != null
-                                        ? Image.file(
-                                      _selectedIdPicture!,
-                                      fit: BoxFit.contain,
-                                    )
-                                        : (_idPictureUrl != null && _idPictureUrl!.isNotEmpty
-                                        ? Image.network(
-                                      'http://192.168.68.77/parkditto_api/$_idPictureUrl',
-                                      fit: BoxFit.contain,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return const Icon(Icons.error, color: Colors.red);
-                                      },
-                                    )
-                                        : const Icon(Icons.credit_card, size: 50)),
+                                    child:
+                                        _selectedIdPicture != null
+                                            ? Image.file(
+                                              _selectedIdPicture!,
+                                              fit: BoxFit.contain,
+                                            )
+                                            : (_idPictureUrl != null &&
+                                                    _idPictureUrl!.isNotEmpty
+                                                ? Image.network(
+                                                  'http://192.168.68.87/parkditto/$_idPictureUrl',
+                                                  fit: BoxFit.contain,
+                                                  errorBuilder: (
+                                                    context,
+                                                    error,
+                                                    stackTrace,
+                                                  ) {
+                                                    return const Icon(
+                                                      Icons.error,
+                                                      color: Colors.red,
+                                                    );
+                                                  },
+                                                )
+                                                : const Icon(
+                                                  Icons.credit_card,
+                                                  size: 50,
+                                                )),
                                   ),
                                   const SizedBox(height: 10),
                                   if (_isEditing)
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         ElevatedButton(
                                           onPressed: _startCamera,
@@ -647,11 +669,18 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                               decoration: BoxDecoration(
                                 color: Colors.grey[100],
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.grey, width: 1),
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
                               ),
                               child: Column(
                                 children: [
-                                  const Icon(Icons.credit_card, size: 50, color: Colors.grey),
+                                  const Icon(
+                                    Icons.credit_card,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  ),
                                   const SizedBox(height: 10),
                                   const Text(
                                     "No ID picture uploaded",
@@ -662,7 +691,9 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                                     ElevatedButton(
                                       onPressed: _startCamera,
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF4C0B0B),
+                                        backgroundColor: const Color(
+                                          0xFF4C0B0B,
+                                        ),
                                         foregroundColor: Colors.white,
                                       ),
                                       child: const Text("Scan ID"),
@@ -685,22 +716,25 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                       _isUploading
                           ? const CircularProgressIndicator()
                           : ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4C0B0B),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF4C0B0B),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 60,
+                              ),
+                            ),
+                            onPressed: _updateProfile,
+                            child: Text(
+                              _isEditing ? "Save Changes" : "Edit Profile",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 60,
-                          ),
-                        ),
-                        onPressed: _updateProfile,
-                        child: Text(
-                          _isEditing ? "Save Changes" : "Edit Profile",
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ),
 
                       const SizedBox(height: 20),
                     ],

@@ -4,22 +4,27 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.68.77/parkditto_api"; // Use 10.0.2.2 for Android emulator
+  static const String baseUrl =
+      "http://192.168.68.87/parkditto/parkditto_api"; // Use 10.0.2.2 for Android emulator
   // For physical device testing: Use your computer's IP address instead of localhost
 
-  static Future<Map<String, dynamic>> login(String username,
-      String password) async {
+  static Future<Map<String, dynamic>> login(
+    String username,
+    String password,
+  ) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/login.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'username': username,
-          'password': password,
-        }),
-      ).timeout(const Duration(seconds: 10)); // Add timeout
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/login.php'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
+              'username': username,
+              'password': password,
+            }),
+          )
+          .timeout(const Duration(seconds: 10)); // Add timeout
 
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -36,20 +41,25 @@ class ApiService {
   }
 
   // api_service.dart - Update the register method
-  static Future<Map<String, dynamic>> register(String username, String email,
-      String password) async {
+  static Future<Map<String, dynamic>> register(
+    String username,
+    String email,
+    String password,
+  ) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/register.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'username': username,
-          'email': email,
-          'password': password,
-        }),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/register.php'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
+              'username': username,
+              'email': email,
+              'password': password,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
       print('Register Response status: ${response.statusCode}');
       print('Register Response body: ${response.body}');
@@ -63,7 +73,8 @@ class ApiService {
           throw Exception(errorResponse['message'] ?? 'Failed to register');
         } catch (e) {
           throw Exception(
-              'Failed to register. Status code: ${response.statusCode}');
+            'Failed to register. Status code: ${response.statusCode}',
+          );
         }
       }
     } catch (e) {
@@ -88,10 +99,12 @@ class ApiService {
     }
     return null;
   }
+
   static Future<String> getUserType() async {
     final userData = await getUserData();
     return userData?['type'] ?? 'user';
   }
+
   // Check if user is logged in
   static Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
@@ -107,12 +120,14 @@ class ApiService {
 
   static Future<List<Map<String, dynamic>>> getParkingSpots() async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/get_parking_spots.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/get_parking_spots.php'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
 
       print('Parking spots response: ${response.statusCode}');
       print('Parking spots body: ${response.body}');
@@ -126,7 +141,8 @@ class ApiService {
         }
       } else {
         throw Exception(
-            'Failed to get parking spots. Status code: ${response.statusCode}');
+          'Failed to get parking spots. Status code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Error getting parking spots: $e');
@@ -135,14 +151,16 @@ class ApiService {
   }
 
   // Create transaction
-  static Future<Map<String, dynamic>> createTransaction(int parkingSpaceId,
-      int userId,
-      String lotNumber,
-      String transactionType,
-      String arrivalTime,
-      double amount,
-      String paymentMethod,
-      {String? departureTime}) async {
+  static Future<Map<String, dynamic>> createTransaction(
+    int parkingSpaceId,
+    int userId,
+    String lotNumber,
+    String transactionType,
+    String arrivalTime,
+    double amount,
+    String paymentMethod, {
+    String? departureTime,
+  }) async {
     try {
       final Map<String, dynamic> requestBody = {
         'parking_space_id': parkingSpaceId,
@@ -158,13 +176,15 @@ class ApiService {
         requestBody['departure_time'] = departureTime;
       }
 
-      final response = await http.post(
-        Uri.parse('$baseUrl/create_transaction.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(requestBody),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/create_transaction.php'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(requestBody),
+          )
+          .timeout(const Duration(seconds: 10));
 
       print('Create transaction response: ${response.statusCode}');
       print('Create transaction body: ${response.body}');
@@ -172,8 +192,9 @@ class ApiService {
       if (response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
-        throw Exception('Failed to create transaction. Status code: ${response
-            .statusCode}');
+        throw Exception(
+          'Failed to create transaction. Status code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Error creating transaction: $e');
@@ -183,14 +204,17 @@ class ApiService {
 
   // Get user transactions
   static Future<List<Map<String, dynamic>>> getUserTransactions(
-      int userId) async {
+    int userId,
+  ) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/get_transactions.php?user_id=$userId'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/get_transactions.php?user_id=$userId'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
 
       print('Transactions response: ${response.statusCode}');
       print('Transactions body: ${response.body}');
@@ -204,7 +228,8 @@ class ApiService {
         }
       } else {
         throw Exception(
-            'Failed to get transactions. Status code: ${response.statusCode}');
+          'Failed to get transactions. Status code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Error getting transactions: $e');
@@ -212,19 +237,20 @@ class ApiService {
     }
   }
 
-// api_service.dart - Add these methods
+  // api_service.dart - Add these methods
 
-// Create booking transaction
-  static Future<Map<String, dynamic>> createBooking(int parkingSpaceId,
-      int userId,
-      String lotNumber,
-      String transactionType,
-      DateTime arrivalTime,
-      double amount,
-      String paymentMethod,
-      String vehicleType, // Add this parameter
-      String floor, // Add this parameter
-      ) async {
+  // Create booking transaction
+  static Future<Map<String, dynamic>> createBooking(
+    int parkingSpaceId,
+    int userId,
+    String lotNumber,
+    String transactionType,
+    DateTime arrivalTime,
+    double amount,
+    String paymentMethod,
+    String vehicleType, // Add this parameter
+    String floor, // Add this parameter
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/create_transaction.php'),
@@ -252,27 +278,30 @@ class ApiService {
     }
   }
 
-// Update parking space availability
+  // Update parking space availability
   static Future<Map<String, dynamic>> updateParkingAvailability(
-      int parkingSpaceId,
-      String vehicleType,
-      String floor,
-      int slotNumber,
-      bool isOccupied,) async {
+    int parkingSpaceId,
+    String vehicleType,
+    String floor,
+    int slotNumber,
+    bool isOccupied,
+  ) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/update_parking_availability.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({
-          'parking_space_id': parkingSpaceId,
-          'vehicle_type': vehicleType,
-          'floor': floor,
-          'slot_number': slotNumber,
-          'is_occupied': isOccupied,
-        }),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/update_parking_availability.php'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode({
+              'parking_space_id': parkingSpaceId,
+              'vehicle_type': vehicleType,
+              'floor': floor,
+              'slot_number': slotNumber,
+              'is_occupied': isOccupied,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
       print('Update parking response: ${response.statusCode}');
       print('Update parking body: ${response.body}');
@@ -281,7 +310,8 @@ class ApiService {
         return jsonDecode(response.body);
       } else {
         throw Exception(
-            'Failed to update parking. Status code: ${response.statusCode}');
+          'Failed to update parking. Status code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Error updating parking: $e');
@@ -291,13 +321,14 @@ class ApiService {
 
   // Add these methods to your ApiService class
 
-
   static Future<List<Map<String, dynamic>>> getActiveReservations(
-      int parkingSpaceId) async {
+    int parkingSpaceId,
+  ) async {
     try {
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/get_active_reservations.php?parking_space_id=$parkingSpaceId'),
+          '$baseUrl/get_active_reservations.php?parking_space_id=$parkingSpaceId',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -313,12 +344,14 @@ class ApiService {
 
   static Future<Map<String, dynamic>> checkExpiredReservations() async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/check_expired_reservations.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/check_expired_reservations.php'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
 
       print('Check expired response: ${response.statusCode}');
       print('Check expired body: ${response.body}');
@@ -327,8 +360,8 @@ class ApiService {
         return jsonDecode(response.body);
       } else {
         throw Exception(
-            'Failed to check expired reservations. Status code: ${response
-                .statusCode}');
+          'Failed to check expired reservations. Status code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Error checking expired reservations: $e');
@@ -336,17 +369,22 @@ class ApiService {
     }
   }
 
-// Get bookings with status filter
-  static Future<List<Map<String, dynamic>>> getBookingsByStatus(int userId,
-      String status) async {
+  // Get bookings with status filter
+  static Future<List<Map<String, dynamic>>> getBookingsByStatus(
+    int userId,
+    String status,
+  ) async {
     try {
-      final response = await http.get(
-        Uri.parse(
-            '$baseUrl/get_bookings_by_status.php?user_id=$userId&status=$status'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(
+            Uri.parse(
+              '$baseUrl/get_bookings_by_status.php?user_id=$userId&status=$status',
+            ),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
 
       print('Bookings by status response: ${response.statusCode}');
       print('Bookings by status body: ${response.body}');
@@ -360,8 +398,8 @@ class ApiService {
         }
       } else {
         throw Exception(
-            'Failed to get bookings by status. Status code: ${response
-                .statusCode}');
+          'Failed to get bookings by status. Status code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Error getting bookings by status: $e');
@@ -371,12 +409,14 @@ class ApiService {
 
   static Future<List<Map<String, dynamic>>> getUserBookings(int userId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/bookings.php?user_id=$userId'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/bookings.php?user_id=$userId'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
 
       print('User bookings response: ${response.statusCode}');
       print('User bookings body: ${response.body}');
@@ -401,7 +441,9 @@ class ApiService {
 
         return [];
       } else {
-        print('Failed to get user bookings. Status code: ${response.statusCode}');
+        print(
+          'Failed to get user bookings. Status code: ${response.statusCode}',
+        );
         return [];
       }
     } catch (e) {
@@ -409,19 +451,20 @@ class ApiService {
       return [];
     }
   }
+
   static Future<Map<String, dynamic>> createBookingWithDuration(
-      int parkingSpaceId,
-      int userId,
-      String lotNumber,
-      String transactionType,
-      String arrivalTime, // This can be empty for bookings
-      double amount,
-      String paymentMethod,
-      String durationType,
-      int durationValue, {
-        String? vehicleType,
-        String? floor,
-      }) async {
+    int parkingSpaceId,
+    int userId,
+    String lotNumber,
+    String transactionType,
+    String arrivalTime, // This can be empty for bookings
+    double amount,
+    String paymentMethod,
+    String durationType,
+    int durationValue, {
+    String? vehicleType,
+    String? floor,
+  }) async {
     final response = await http.post(
       Uri.parse('$baseUrl/create_transaction.php'),
       headers: {'Content-Type': 'application/json'},
@@ -448,7 +491,11 @@ class ApiService {
   }
   // Add these methods to your ApiService class
 
-  static Future<Map<String, dynamic>> uploadImage(File imageFile, int userId, String type) async {
+  static Future<Map<String, dynamic>> uploadImage(
+    File imageFile,
+    int userId,
+    String type,
+  ) async {
     try {
       var request = http.MultipartRequest(
         'POST',
@@ -458,11 +505,13 @@ class ApiService {
       request.fields['user_id'] = userId.toString();
       request.fields['type'] = type;
 
-      request.files.add(await http.MultipartFile.fromPath(
-        'file',
-        imageFile.path,
-        filename: imageFile.path.split('/').last,
-      ));
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          imageFile.path,
+          filename: imageFile.path.split('/').last,
+        ),
+      );
 
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
@@ -478,12 +527,12 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> updateProfileWithImages(
-      int userId,
-      String firstName,
-      String lastName,
-      {String? displayPhotoPath,
-        String? idPicturePath}
-      ) async {
+    int userId,
+    String firstName,
+    String lastName, {
+    String? displayPhotoPath,
+    String? idPicturePath,
+  }) async {
     try {
       final Map<String, dynamic> requestBody = {
         'id': userId,
@@ -499,13 +548,15 @@ class ApiService {
         requestBody['id_picture'] = idPicturePath;
       }
 
-      final response = await http.post(
-        Uri.parse('$baseUrl/update_profile.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(requestBody),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/update_profile.php'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(requestBody),
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
@@ -514,6 +565,78 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Profile update error: $e');
+    }
+  }
+
+  // Add this method to your ApiService class
+  static Future<Map<String, dynamic>> updateTransactionStatus(
+    int transactionId,
+    String status,
+  ) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/update_transaction_status.php'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, dynamic>{
+              'transaction_id': transactionId,
+              'status': status,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      print('Update transaction status response: ${response.statusCode}');
+      print('Update transaction status body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+          'Failed to update transaction status. Status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('Error updating transaction status: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  // Add this method to get transaction details
+  static Future<Map<String, dynamic>> getTransactionDetails(
+    int transactionId,
+  ) async {
+    try {
+      final response = await http
+          .get(
+            Uri.parse(
+              '$baseUrl/get_transaction_details.php?transaction_id=$transactionId',
+            ),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      print('Transaction details response: ${response.statusCode}');
+      print('Transaction details body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        if (result['success']) {
+          return result['data'];
+        } else {
+          throw Exception('Failed to get transaction details');
+        }
+      } else {
+        throw Exception(
+          'Failed to get transaction details. Status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('Error getting transaction details: $e');
+      throw Exception('Network error: $e');
     }
   }
 }

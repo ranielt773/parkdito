@@ -236,7 +236,7 @@ class _PlanPageState extends State<PlanPage> {
                 ),
                 child: imageUrl.isNotEmpty
                     ? Image.network(
-                  "http://192.168.68.77/parkditto_api/parkspace_img/2.png",
+                  "http://192.168.68.77/parkditto/parkditto_api/parkspace_img/2.png",
                   height: 100,
                   width: double.infinity,
                   fit: BoxFit.cover,

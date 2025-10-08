@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parkditto/mainpage.dart';
 import 'cctv_view.dart';
 import 'plan.dart';
 
@@ -48,7 +49,14 @@ class _BookingStatusPageState extends State<BookingStatusPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  // Navigate back to HomePage and set the bottom nav to home (index 0)
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MainPage()),
+                        (route) => false,
+                  );
+                },
                 child: Image.asset(
                   "assets/back.png",
                   width: 40,

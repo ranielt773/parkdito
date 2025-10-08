@@ -124,18 +124,34 @@ class _ReservePageState extends State<ReservePage> {
     return earthRadius * c;
   }
 
-  // Filter parking spots within 5km radius
-  void _filterParkingSpots() {
+  // Filter parking spots within 5km radius and sort by distance (nearest first)
+  void _filterAndSortParkingSpots() {
     if (userLocation == null) return;
 
     setState(() {
-      filteredParkingSpots = allParkingSpots.where((spot) {
+      // First filter spots within 5km
+      List<Map<String, dynamic>> nearbySpots = allParkingSpots.where((spot) {
         double distance = _calculateDistance(userLocation!, LatLng(
             double.parse(spot['latitude'].toString()),
             double.parse(spot['longitude'].toString())
         ));
         return distance <= 5.0; // 5km radius
       }).toList();
+
+      // Then sort by distance (nearest first)
+      nearbySpots.sort((a, b) {
+        double distanceA = _calculateDistance(userLocation!, LatLng(
+            double.parse(a['latitude'].toString()),
+            double.parse(a['longitude'].toString())
+        ));
+        double distanceB = _calculateDistance(userLocation!, LatLng(
+            double.parse(b['latitude'].toString()),
+            double.parse(b['longitude'].toString())
+        ));
+        return distanceA.compareTo(distanceB);
+      });
+
+      filteredParkingSpots = nearbySpots;
     });
   }
 
@@ -162,8 +178,8 @@ class _ReservePageState extends State<ReservePage> {
         });
       }
 
-      // Filter parking spots after getting user location
-      _filterParkingSpots();
+      // Filter and sort parking spots after getting user location
+      _filterAndSortParkingSpots();
 
       if (userLocation != null) {
         _mapController.move(userLocation!, 14);
@@ -412,7 +428,7 @@ class _ReservePageState extends State<ReservePage> {
               ),
             ),
 
-            // ✅ List ng cards - using FILTERED parking spots (only nearby ones)
+            // ✅ List ng cards - using FILTERED and SORTED parking spots (nearest first)
             filteredParkingSpots.isEmpty
                 ? Padding(
               padding: const EdgeInsets.all(16.0),

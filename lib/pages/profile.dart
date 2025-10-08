@@ -34,7 +34,9 @@ class _ProfilePageState extends State<ProfilePage> {
   void _navigateToPersonalDetails(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PersonalDetailsPage(userData: userData)),
+      MaterialPageRoute(
+        builder: (context) => PersonalDetailsPage(userData: userData),
+      ),
     ).then((_) {
       // Reload user data when returning from details page
       _loadUserData();
@@ -76,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const LoginPage()),
-                      (route) => false,
+                  (route) => false,
                 );
               },
               child: const Text("Logout"),
@@ -118,150 +120,169 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-        children: <Widget>[
-          const SizedBox(height: 20),
-          // Profile Picture with circular container
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Color(0xFF3B060A).withOpacity(0.3),
-                width: 2,
-              ),
-              color: Colors.white,
-            ),
-            child: ClipOval(
-              child: userData != null &&
-                  userData!['display_photo'] != null &&
-                  userData!['display_photo'].toString().isNotEmpty
-                  ? Image.network(
-                'http://192.168.68.77/parkditto_api/${userData!['display_photo']}',
-                fit: BoxFit.cover,
-                width: 100,
-                height: 100,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    "assets/display.png",
-                    fit: BoxFit.cover,
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                children: <Widget>[
+                  const SizedBox(height: 20),
+                  // Profile Picture with circular container
+                  Container(
                     width: 100,
                     height: 100,
-                  );
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                          : null,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Color(0xFF3B060A).withOpacity(0.3),
+                        width: 2,
+                      ),
+                      color: Colors.white,
                     ),
-                  );
-                },
-              )
-                  : Image.asset(
-                "assets/display.png",
-                fit: BoxFit.cover,
-                width: 100,
-                height: 100,
-              ),
-            ),
-          ),
-          const SizedBox(height: 15),
-          // Display username if available
-          if (userData != null && userData!['username'] != null)
-            Text(
-              userData!['username'],
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF3B060A),
-              ),
-            ),
-          // Display full name if available
-          if (userData != null &&
-              (userData!['first_name'] != null || userData!['last_name'] != null))
-            Text(
-              '${userData!['first_name'] ?? ''} ${userData!['last_name'] ?? ''}',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color(0xFF3B060A),
-              ),
-            ),
-          const SizedBox(height: 20),
+                    child: ClipOval(
+                      child:
+                          userData != null &&
+                                  userData!['display_photo'] != null &&
+                                  userData!['display_photo']
+                                      .toString()
+                                      .isNotEmpty
+                              ? Image.network(
+                                'http://192.168.68.87/parkditto_api/${userData!['display_photo']}',
+                                fit: BoxFit.cover,
+                                width: 100,
+                                height: 100,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    "assets/display.png",
+                                    fit: BoxFit.cover,
+                                    width: 100,
+                                     height: 100,
+                                  );
+                                },
+                                loadingBuilder: (
+                                  context,
+                                  child,
+                                  loadingProgress,
+                                ) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                    ),
+                                  );
+                                },
+                              )
+                              : Image.asset(
+                                "assets/display.png",
+                                fit: BoxFit.cover,
+                                width: 100,
+                                height: 100,
+                              ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  // Display username if available
+                  if (userData != null && userData!['username'] != null)
+                    Text(
+                      userData!['username'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF3B060A),
+                      ),
+                    ),
+                  // Display full name if available
+                  if (userData != null &&
+                      (userData!['first_name'] != null ||
+                          userData!['last_name'] != null))
+                    Text(
+                      '${userData!['first_name'] ?? ''} ${userData!['last_name'] ?? ''}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF3B060A),
+                      ),
+                    ),
+                  const SizedBox(height: 20),
 
-          // Options List
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xFFFDF7D8).withOpacity(0.53),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                children: [
-                  buildMenuItem(
-                    "Personal Details",
-                    onTap: () {
-                      _navigateToPersonalDetails(context);
-                    },
-                  ),
-                  buildMenuItem(
-                    "Plan Status",
-                    onTap: () {
-                      _navigateToMyPlan(context);
-                    },
-                  ),
-                  buildMenuItem(
-                    "Change Password",
-                    onTap: () {
-                      _navigateToChangePassword(context);
-                    },
-                  ),
-                  buildMenuItem("Settings", onTap: () {}),
-                  const SizedBox(height: 30),
-
-                  // Sign Out Button
-                  Center(
-                    child: ElevatedButton.icon(
-                      onPressed: _handleLogout,
-                      icon: const Icon(Icons.logout, color: Colors.white),
-                      label: const Text(
-                        "Sign out",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins',
-                          letterSpacing: 0.5,
+                  // Options List
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFDF7D8).withOpacity(0.53),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4C0B0B),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                      child: ListView(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 60,
-                          vertical: 3,
+                          horizontal: 30,
+                          vertical: 20,
                         ),
+                        children: [
+                          buildMenuItem(
+                            "Personal Details",
+                            onTap: () {
+                              _navigateToPersonalDetails(context);
+                            },
+                          ),
+                          buildMenuItem(
+                            "Plan Status",
+                            onTap: () {
+                              _navigateToMyPlan(context);
+                            },
+                          ),
+                          buildMenuItem(
+                            "Change Password",
+                            onTap: () {
+                              _navigateToChangePassword(context);
+                            },
+                          ),
+                          buildMenuItem("Settings", onTap: () {}),
+                          const SizedBox(height: 30),
+
+                          // Sign Out Button
+                          Center(
+                            child: ElevatedButton.icon(
+                              onPressed: _handleLogout,
+                              icon: const Icon(
+                                Icons.logout,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                "Sign out",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Poppins',
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF4C0B0B),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 60,
+                                  vertical: 3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
